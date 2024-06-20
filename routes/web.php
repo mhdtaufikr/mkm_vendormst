@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\VendorMstController;
+use App\Http\Controllers\CustomerMstController;
 
 
 
@@ -33,6 +34,9 @@ Route::middleware(['auth'])->group(function () {
 
     //Vendor Master
     Route::get('/form/list', [HomeController::class, 'list']);
+
+    //Customer Master
+    Route::post('/customer/store', [CustomerMstController::class, 'store']);
 
     //Dropdown Controller
      Route::get('/dropdown', [DropdownController::class, 'index'])->middleware(['checkRole:IT']);

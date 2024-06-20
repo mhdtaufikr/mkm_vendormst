@@ -19,7 +19,7 @@ class HomeController extends Controller
           $dropdown = Dropdown::where('category', 'Form')
                       ->orderBy('name_value', 'asc')
                       ->get();
-          
+
           return view('master.list', compact('item','dropdown'));
     }
 
@@ -33,7 +33,9 @@ class HomeController extends Controller
         if ($form === 'Master Vendor') {
             return view('form.mstvendor');
         } elseif ($form === 'Master Customer') {
-            return view('form.mstcustomer');
+            $customerAG = Dropdown::where('category','Customer AG')->get();
+            $tax = Dropdown::where('category','Withholding Tax')->get();
+            return view('form.mstcustomer',compact('customerAG','tax'));
         } else {
             // Handle any other cases or provide a default view
             abort(404); // or redirect to an error page

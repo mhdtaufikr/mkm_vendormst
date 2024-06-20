@@ -11,7 +11,7 @@
                 </a>
                 <a class="nav-link" href="{{url('/form/list')}}">
                     <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
-                   Vendor Master
+                   Form Master
                 </a>
                  <!-- Sidenav Menu Heading (Master)-->
                  <div class="sidenav-menu-heading">Master</div>

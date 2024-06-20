@@ -9,7 +9,7 @@
         </div>
     </header>
     <!-- Main page content-->
-    <div class="container-fluid px-4 mt-n10">       
+    <div class="container-fluid px-4 mt-n10">
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -34,16 +34,16 @@
                                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                                 <strong>{{ session('status') }}</strong>
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div> 
+                                            </div>
                                             @endif
 
                                             @if (session('failed'))
                                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                                 <strong>{{ session('failed') }}</strong>
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                            </div> 
+                                            </div>
                                             @endif
-                                            
+
                                             <!--validasi form-->
                                             @if (count($errors) > 0)
                                                 <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -59,7 +59,7 @@
                                             <!--end validasi form-->
                                         </div>
                                     </div>
-                                    
+
                                     <form method="POST" action="{{ url('/vendor/store') }}">
                                         @csrf
                                         <h3><strong>Vendor Master Maintenance Request Form</strong></h3>
@@ -96,7 +96,7 @@
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
-          
+
                                                                 <div class="form-check form-check-inline">
                                                                     <input class="form-check-input" type="radio" name="account_group" id="general_affairs_vendor" value="general_affairs_vendor">
                                                                     <label class="form-check-label" for="general_affairs_vendor">MKM General Affairs Vendor</label>
@@ -117,7 +117,7 @@
                                                                     <input class="form-check-input" type="radio" name="account_group" id="government_related_vendor" value="government_related_vendor">
                                                                     <label class="form-check-label" for="government_related_vendor">Government Related Vendor</label>
                                                                 </div>
-                                                                
+
                                                             </div>
                                                         </div>
 
@@ -153,16 +153,16 @@
                                                             <label for="previous_sap_vendor_number" class="form-label">Previous SAP Vendor Number</label>
                                                             <input type="text" class="form-control" id="previous_sap_vendor_number" name="previous_sap_vendor_number">
                                                         </div>
-                                                        
+
                                                        <small class="text-danger form-text">Note<span class="text-danger">*</span> : For Change, Block, Delete please enter the previous SAP Vendor number</small>
-                                                      
+
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            
-                                          
-                                            
+
+
+
+
                                         </div>
                                         <hr class="my-4">
 
@@ -173,7 +173,7 @@
                                                 <label for="company_code" class="form-label">Company Code</label>
                                                 <input type="text" class="form-control" id="company_code" name="company_code"  required>
                                             </div>
-                                            
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="vendor_name" class="form-label">Vendor Name</label>
                                                 <input type="text" class="form-control" id="vendor_name" name="vendor_name" required>
@@ -236,11 +236,11 @@
                                                 <label for="name" class="form-label">Name<span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="name" name="name" required>
                                             </div>
-                                            
+
                                         </div>
 
                                         <div class="row">
-                                           
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="search_term_1" class="form-label">Search Term 1<span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="search_term_1" name="search_term_1" required>
@@ -252,7 +252,7 @@
                                         </div>
 
                                         <div class="row">
-                                            
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="street" class="form-label">Street<span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="street" name="street" required>
@@ -264,7 +264,7 @@
                                         </div>
 
                                         <div class="row">
-                                            
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="postal_code" class="form-label">Postal Code<span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="postal_code" name="postal_code" required>
@@ -276,7 +276,7 @@
                                         </div>
 
                                         <div class="row">
-                                            
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="country" class="form-label">Country<span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="country" name="country" required>
@@ -288,7 +288,7 @@
                                         </div>
 
                                         <div class="row">
-                                           
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="po_box" class="form-label">P.O. Box<span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="po_box" name="po_box">
@@ -300,7 +300,7 @@
                                         </div>
 
                                         <div class="row">
-                                            
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="fax" class="form-label">Fax</label>
                                                 <input type="text" class="form-control" id="fax" name="fax">
@@ -316,7 +316,7 @@
                                         <h3><strong>Create Vendor Control</strong></h3>
 
                                         <div class="row">
-                                            
+
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Tax Code<span class="text-danger">*</span></label><br>
                                                 <div class="form-check form-check-inline">
@@ -332,14 +332,14 @@
                                                     <label class="form-check-label" for="no-npwp">No NPWP<span class="text-danger">*</span></label>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="col-md-6 mb-3">
                                                 <label for="npwp" class="form-label">NPWP<span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="npwp" name="npwp" required>
                                                 <br>
                                                 <small class="text-danger form-text"><span class="text-danger">*</span> Tidak memiliki NPWP tidak dapat didaftarkan</small>
                                             </div>
-                                            
+
                                         </div>
 
                                         <hr class="my-4">
@@ -347,7 +347,7 @@
                                         <h3><strong>Create Vendor Payment Control</strong></h3>
 
                                         <div class="row">
-                                            
+
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="col-md-12 mb-3">
@@ -358,9 +358,9 @@
                                                         <label for="bank_key" class="form-label">Bank Key</label>
                                                         <input type="text" class="form-control" id="bank_key" name="bank_key">
                                                     </div>
-                                                
-        
-                                               
+
+
+
                                                     <div class="col-md-12 mb-3">
                                                         <label for="bank_account" class="form-label">Bank Account<span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="bank_account" name="bank_account" required>
@@ -369,10 +369,10 @@
                                                         <label for="account_holder" class="form-label">Account Holder<span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="account_holder" name="account_holder" required>
                                                     </div>
-                                               
-        
-                                                
-                                                
+
+
+
+
                                                     <div class="col-md-12 mb-3">
                                                         <label for="bank_region" class="form-label">Bank Region<span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="bank_region" name="bank_region">
@@ -416,7 +416,7 @@
                                                         <label for="confirmed_by" class="form-label">CONFIRMED BY</label>
                                                         <input type="text" class="form-control" id="confirmed_by" name="confirmed_by">
                                                     </div>
-                                                    
+
                                                 </div>
 
                                             </div>
@@ -425,7 +425,7 @@
                                         <hr class="my-4">
 
                                         <h3><strong>Create Vendor Accounting Information </strong></h3>
-                                        
+
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="recon_account" class="form-label">Recon Account</label>
@@ -435,7 +435,7 @@
                                                 <label for="sort_key" class="form-label">Sort Key</label>
                                                 <input type="text" class="form-control" id="sort_key" name="sort_key">
                                             </div>
-                                           
+
                                         </div>
 
                                         <div class="row">
@@ -496,14 +496,14 @@
                                                 <label for="payment_block" class="form-label">Payment Block</label>
                                                 <input type="checkbox" class="form-check-input" id="payment_block" name="payment_block">
                                             </div>
-                                           
-                                            
+
+
                                         </div>
 
                                         <div class="d-flex justify-content-center">
                                             <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                         </div>
-                                        
+
                                     </form>
                                 </div>
                                 <!-- /.card-body -->
@@ -525,8 +525,8 @@
 <script>
     $(document).ready(function() {
         var table = $("#tableUser").DataTable({
-            "responsive": true, 
-            "lengthChange": false, 
+            "responsive": true,
+            "lengthChange": false,
             "autoWidth": false,
             // "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         });
