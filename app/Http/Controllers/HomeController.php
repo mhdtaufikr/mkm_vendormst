@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\VendorMaster;
+use App\Models\CustomerMaster;
 use App\Models\Dropdown;
 
 class HomeController extends Controller
@@ -11,16 +11,6 @@ class HomeController extends Controller
     {
         return view('home.index');
 
-    }
-
-    public function list(){
-          // Fetch all vendor masters with their current status
-          $item = VendorMaster::with('currentStatus')->get();
-          $dropdown = Dropdown::where('category', 'Form')
-                      ->orderBy('name_value', 'asc')
-                      ->get();
-
-          return view('master.list', compact('item','dropdown'));
     }
 
 

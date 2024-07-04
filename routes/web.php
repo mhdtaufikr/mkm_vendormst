@@ -33,9 +33,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mst/form', [HomeController::class, 'form']);
 
     //Vendor Master
-    Route::get('/form/list', [HomeController::class, 'list']);
+    Route::get('/mst/vendor', [VendorMstController::class, 'index']);
+    Route::get('/mst/vendor/form', [VendorMstController::class, 'form']);
+    Route::post('/vendor/store', [VendorMstController::class, 'store']);
+    Route::get('/vendor/detail/{id}', [VendorMstController::class, 'detail']);
+    Route::get('/vendor/update/{id}', [VendorMstController::class, 'update']);
+    Route::post('/vendor/update/store', [VendorMstController::class, 'storeUpdate']);
+    Route::get('/vendor/checked/{id}', [VendorMstController::class, 'checked']);
+    Route::post('/vendor/approval', [VendorMstController::class, 'approval']);
+
 
     //Customer Master
+    Route::get('/mst/customer', [CustomerMstController::class, 'index']);
+    Route::get('/mst/customer/form', [CustomerMstController::class, 'form']);
     Route::post('/customer/store', [CustomerMstController::class, 'store']);
 
     //Dropdown Controller

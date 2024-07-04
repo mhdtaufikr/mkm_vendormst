@@ -9,9 +9,13 @@
                     <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-home"></i></div>
                     Home
                 </a>
-                <a class="nav-link" href="{{url('/form/list')}}">
+                <a class="nav-link" href="{{url('/mst/customer')}}">
                     <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
-                   Form Master
+                Master Customer
+                </a>
+                <a class="nav-link" href="{{url('/mst/vendor')}}">
+                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                Master Vendor
                 </a>
                  <!-- Sidenav Menu Heading (Master)-->
                  <div class="sidenav-menu-heading">Master</div>

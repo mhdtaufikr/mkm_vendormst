@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>MKM Vendor Master</title>
+    <title>MKM Vendor & Customer Master</title>
     <link href="{{asset('assets/css/styles.css')}}" rel="stylesheet" />
     <link rel="icon" href="{{ asset('assets/img/logo_kop2.gif') }}">
     <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
@@ -69,7 +69,7 @@
                                     @endif
 
                                     <!--alert success -->
-                                    <h1 class="text-center font-weight-bold mb-4">MKM Vendor Master</h1>
+                                    <h1 class="text-center font-weight-bold mb-4">MKM Vendor & Csutomer Master</h1>
 
                                     <!-- Login form-->
                                     <form action="{{ url('auth/login') }}" method="POST" enctype="multipart/form-data">

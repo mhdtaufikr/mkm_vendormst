@@ -19,4 +19,9 @@ class VendorMaster extends Model
     {
         return $this->changes()->orderBy('created_at', 'desc')->first();
     }
+
+    public function latestChange()
+    {
+        return $this->hasOne(VendorChange::class, 'vendor_id')->latest();
+    }
 }

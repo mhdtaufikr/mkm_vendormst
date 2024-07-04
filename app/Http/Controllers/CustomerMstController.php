@@ -4,9 +4,28 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CustomerMaster;
+use App\Models\Dropdown;
 
 class CustomerMstController extends Controller
 {
+
+    public function index(){
+        // Fetch all vendor masters with their current status
+        $item = CustomerMaster::get();
+        $dropdown = Dropdown::where('category', 'Form')
+                    ->orderBy('name_value', 'asc')
+                    ->get();
+
+        return view('master.list', compact('item','dropdown'));
+    }
+
+    public function form(){
+        $customerAG = Dropdown::where('category','Customer AG')->get();
+        $tax = Dropdown::where('category','Withholding Tax')->get();
+        return view('form.mstcustomer',compact('customerAG','tax'));
+    }
+
+
     public function store(Request $request)
     {
         // Validate $request if needed
