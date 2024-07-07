@@ -13,49 +13,49 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function postLogin(Request $request){
-        $emailOrName = $request->input('email');
-        $password = $request->input('password');
+    public function postLogin(Request $request)
+{
+    $usernameOrEmail = $request->input('email');
+    $password = $request->input('password');
+    // Determine if input is likely an email address
+    $isEmail = filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL);
 
-        // Determine if input is likely an email address
-        $isEmail = filter_var($emailOrName, FILTER_VALIDATE_EMAIL);
-
-        // Define the credentials array based on input type
-        if ($isEmail) {
-            $credentials = ['email' => $emailOrName];
-        } else {
-            $credentials = ['name' => $emailOrName];
-        }
-
-        $credentials['password'] = $password;
-
-        // Attempt authentication
-        if (Auth::attempt($credentials)) {
-            // Authentication successful
-            $user = Auth::user();
-
-            // Check user status
-            if ($user->is_active == '1') {
-                // Update last login
-
-                  //update last login
-                  $update_lastlogin=User:: where('email',$user->email)
-                  ->update([
-                      'last_login' => now(),
-                      'login_counter' =>  $user->login_counter + 1,
-                  ]);
-
-                // Redirect to home page
-                return redirect('/home');
-            } else {
-                // User is not active, redirect with message
-                return redirect('/')->with('statusLogin', 'Give Access First to User');
-            }
-        } else {
-            // Authentication failed, redirect with message
-            return redirect('/')->with('statusLogin', 'Wrong Email/Name or Password');
-        }
+    // Define the credentials array based on input type
+    if ($isEmail) {
+        $credentials = ['email' => $usernameOrEmail];
+    } else {
+        $credentials = ['username' => $usernameOrEmail];
     }
+
+    $credentials['password'] = $password;
+
+    // Attempt authentication
+    if (Auth::attempt($credentials)) {
+        // Authentication successful
+        $user = Auth::user();
+
+        // Check user status
+        if ($user->is_active == '1') {
+            // Update last login
+            User::where('id', $user->id)
+                ->update([
+                    'last_login' => now(),
+                    'login_counter' => $user->login_counter + 1,
+                ]);
+
+            // Redirect to home page
+            return redirect('/home');
+        } else {
+            // User is not active, redirect with message
+            return redirect('/')->with('statusLogin', 'Give Access First to User');
+        }
+    } else {
+        // Authentication failed, redirect with message
+        return redirect('/')->with('statusLogin', 'Wrong Username/Email or Password');
+    }
+}
+
+
 
 
     public function logout()

@@ -208,7 +208,7 @@
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="vendor_name" class="form-label">Vendor Name</label>
+                                                        <label for="vendor_name" class="form-label">Vendor No. Reference</label>
                                                         <input type="text" class="form-control" id="vendor_name" name="vendor_name">
                                                     </div>
                                                 </div>

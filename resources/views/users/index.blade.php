@@ -52,45 +52,72 @@
                           </button>
 
                           <!-- Modal -->
-                          <div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="modal-add-label">Add User</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <form action="{{ url('/user/store') }}" method="POST">
-                                  @csrf
-                                  <div class="modal-body">
-                                    <div class="form-group">
-                                      <input type="text" class="form-control" id="name" name="name" placeholder="Enter User Name" required>
-                                    </div>
-                                    <br>
-                                    <div class="form-group">
-                                      <input type="email" class="form-control" id="email" name="email" placeholder="Enter User Email" required>
-                                    </div>
-                                    <br>
-                                    <div class="form-group">
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter User Password" required>
-                                      </div>
-                                      <br>
-                                    <div class="form-group">
-                                        <select name="role" id="role" class="form-control">
-                                            <option value="">- Please Select Role -</option>
-                                            @foreach ($dropdown as $role)
-                                                <option value="{{ $role->name_value }}">{{ $role->name_value }}</option>
-                                            @endforeach
-                                          </select>
-                                        </div>
-                                  </div>
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                  </div>
-                                </form>
-                              </div>
-                            </div>
-                          </div>
+<div class="modal fade" id="modal-add" tabindex="-1" aria-labelledby="modal-add-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-add-label">Add User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{{ url('/user/store') }}" method="POST">
+            @csrf
+            <div class="modal-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="level">Level</label>
+                        <input type="number" class="form-control" id="level" name="level" placeholder="Enter Level" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="role">Role</label>
+                        <select name="role" id="role" class="form-control" required>
+                          <option value="">- Please Select Role -</option>
+                          @foreach ($dropdown as $role)
+                            <option value="{{ $role->name_value }}">{{ $role->name_value }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="dept">Department</label>
+                        <input type="text" class="form-control" id="dept" name="dept" placeholder="Enter Department" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="is_active">Is Active</label>
+                        <select name="is_active" id="is_active" class="form-control" required>
+                          <option value="1">Active</option>
+                          <option value="0">Inactive</option>
+                        </select>
+                      </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 
 
                     <div class="col-sm-12">
@@ -121,31 +148,37 @@
                 <div class="table-responsive">
                 <table id="tableUser" class="table table-bordered table-striped">
                   <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Last Login</th>
-                    <th>Action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
+                    <tr>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Dept</th>
+                        <th>Level</th>
+                        <th>Role</th>
+                        <th>Last Login</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
                     @php
-                      $no=1;
+                        $no = 1;
                     @endphp
                     @foreach ($user as $data)
                     <tr>
                         <td>{{ $no++ }}</td>
+                        <td>{{ $data->username }}</td>
                         <td>{{ $data->name }}</td>
                         <td>{{ $data->email }}</td>
+                        <td>{{ $data->dept }}</td>
+                        <td>{{ $data->level }}</td>
                         <td>{{ $data->role }}</td>
-                        <td> {{ date('d-m-Y H:i:s', strtotime($data->last_login)) }}</td>
+                        <td>{{ date('d-m-Y H:i:s', strtotime($data->last_login)) }}</td>
                         <td>
                             <button title="Edit User" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-update{{ $data->id }}">
                                 <i class="fas fa-user-edit"></i>
                             </button>
-                            @if ($data->is_active=='1')
+                            @if ($data->is_active == '1')
                             <button title="Revoke Access" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-revoke{{ $data->id }}">
                                 <i class="fas fa-user-lock"></i>
                             </button>
@@ -157,39 +190,76 @@
                         </td>
                     </tr>
 
-                     {{-- Modal Update --}}
-                     <div class="modal fade" id="modal-update{{ $data->id }}" tabindex="-1" aria-labelledby="modal-update{{ $data->id }}-label" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title" id="modal-update{{ $data->id }}-label">Edit User</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <form action="{{ url('/user/update/'.$data->id) }}" enctype="multipart/form-data" method="POST">
-                                    @csrf
-                                    @method('patch')
-                                    <div class="modal-body">
-                                        <div class="mb-3 form-group">
-                                            <label for="email">{{ $data->email }}</label>
-                                        </div>
-                                        <div class="form-group">
-                                            <select name="role" id="role" class="form-control">
-                                                <option value="">- Please Select Role -</option>
-                                                @foreach ($dropdown as $role)
-                                                    <option value="{{ $role->name_value }}" {{ $data->role == $role->name_value ? 'selected' : '' }}>{{ $role->name_value }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="button" class="btn btn-dark btn-default" data-bs-dismiss="modal">Close</button>
-                                        <input type="submit" class="btn btn-primary" value="Update">
-                                    </div>
-                                </form>
+                    {{-- Modal Update --}}
+<div class="modal fade" id="modal-update{{ $data->id }}" tabindex="-1" aria-labelledby="modal-update{{ $data->id }}-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-update{{ $data->id }}-label">Edit User</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url('/user/update/'.$data->id) }}" enctype="multipart/form-data" method="POST">
+                @csrf
+                @method('patch')
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" value="{{ $data->username }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ $data->email }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="level">Level</label>
+                                <input type="number" class="form-control" id="level" name="level" value="{{ $data->level }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="role">Role</label>
+                                <select name="role" id="role" class="form-control">
+                                    <option value="">- Please Select Role -</option>
+                                    @foreach ($dropdown as $role)
+                                        <option value="{{ $role->name_value }}" {{ $data->role == $role->name_value ? 'selected' : '' }}>{{ $role->name_value }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ $data->name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank if not changing">
+                            </div>
+                            <div class="form-group">
+                                <label for="dept">Department</label>
+                                <input type="text" class="form-control" id="dept" name="dept" value="{{ $data->dept }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="is_active">Is Active</label>
+                                <select name="is_active" id="is_active" class="form-control" required>
+                                    <option value="1" {{ $data->is_active == '1' ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ $data->is_active == '0' ? 'selected' : '' }}>Inactive</option>
+                                </select>
                             </div>
                         </div>
                     </div>
-                      {{-- Modal Update --}}
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-dark btn-default" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Update">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{-- Modal Update --}}
+
 
                       {{-- Modal Access --}}
                       <div class="modal fade" id="modal-access{{ $data->id }}">

@@ -20,32 +20,43 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-
+        // Validate the incoming request data
         $request->validate([
-            'name' => 'required',
-            'email' => 'required',
-            'role' => 'required',
-            'password' => 'required',
+            'username' => 'required|string|max:45',
+            'name' => 'required|string|max:255',
+            'level' => 'required|integer',
+            'dept' => 'required|string|max:45',
+            'password' => 'required|string|min:8',
+            'role' => 'required|string|max:255',
+            'is_active' => 'required|in:1,0',
         ]);
 
+        // Hash the password
         $password = bcrypt($request->password);
-        //dd($password);
-        $addUser=User::create([
-            'id_partner' => '0',
+
+        // Create a new user record
+        $addUser = User::create([
+            'username' => $request->username,
             'name' => $request->name,
             'email' => $request->email,
+            'level' => $request->level,
+            'dept' => $request->dept,
             'password' => $password,
             'role' => $request->role,
+            'is_active' => $request->is_active,
             'last_login' => null,
-            'is_active' => '1',
-
+            'login_counter' => 0,
         ]);
+
+        // Check if the user creation was successful and redirect accordingly
         if ($addUser) {
-            return redirect('/user')->with('status','Success Add User');
-        }else{
-            return redirect('/user')->with('status','Failed Add User');
+            return redirect('/user')->with('status', 'Success Add User');
+        } else {
+            return redirect('/user')->with('status', 'Failed Add User');
         }
     }
+
+
 
     public function storePartner(Request $request)
     {
@@ -96,11 +107,36 @@ class UserController extends Controller
 
 
     public function update(Request $request, $id)
-    {
-        $role= User::where('id',$id)
-        ->update([
-            'role' => $request->role,
-        ]);
-            return redirect('/user')->with('status','Success Revoke User');
+{
+    $request->validate([
+        'username' => 'required|string|max:45',
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255',
+        'password' => 'nullable|string|min:8',
+        'role' => 'required|string|max:255',
+        'dept' => 'required|string|max:45',
+        'level' => 'required|integer',
+    ]);
+
+    // Prepare data for update
+    $updateData = [
+        'username' => $request->username,
+        'name' => $request->name,
+        'email' => $request->email,
+        'role' => $request->role,
+        'dept' => $request->dept,
+        'level' => $request->level,
+    ];
+
+    // If password is provided, hash it and include it in the update data
+    if ($request->filled('password')) {
+        $updateData['password'] = bcrypt($request->password);
     }
+
+    // Perform the update
+    User::where('id', $id)->update($updateData);
+
+    return redirect('/user')->with('status', 'Success Update User');
+}
+
 }

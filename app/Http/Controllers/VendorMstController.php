@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Http;
 use App\Models\VendorChange;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ApprovalRoute;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VendorApprovalMail;
+use App\Mail\VendorRemandMail;
 use Carbon\Carbon;
 
 
@@ -135,7 +137,7 @@ class VendorMstController extends Controller
                 'remarks' => $validatedData['Remarks'],
                 'status' => 'Pending', // Set initial status as pending
                 'created_by' => Auth::id(), // Assuming you have authentication and get the current user's ID
-                'approval_level' => 1,
+                'level' => 1,
             ];
 
             // Create a new vendor change record
@@ -154,28 +156,30 @@ class VendorMstController extends Controller
         $approvalLog->approval_level = 0;
         $approvalLog->save();
 
-         // Handle approval routing
-         $userDept = Auth::user()->dept;
-         $approvalRoute = ApprovalRoute::where('dept', $userDept)
-         ->where('level', 1) // Assuming level 1 is always required
-         ->get();
+        // Handle approval routing
+        $user = Auth::user();
+        $userDept = $user->dept;
+        $userName = $user->username;
 
-
-         foreach ($approvalRoute as $approvalRoute) {
+        // Cari approver berdasarkan dept dan requester
+        $approvalRoutes = ApprovalRoute::where('dept', $userDept)
+            ->where('requester', $userName)
+            ->where('level', 1)
+            ->get();
+        foreach ($approvalRoutes as $route) {
             // Send approval email to each approver
             $vendorId = $vendorMaster->id;
-            $approverEmail = $approvalRoute->email;
-
-            $approvalName = $approvalRoute->name;
-
+            $approverEmail = $route->email;
+            $approvalName = $route->name;
             $approvalLink = url("/vendor/checked/" . encrypt($vendorId));
 
             // Send email
-            Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink,$approvalName));
+            Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink, $approvalName));
         }
 
-        // Redirect or return a response as needed
-        return redirect('/mst/vendor')->with('status', 'success input master vendor');
+            // Redirect or return a response as needed
+            return redirect('/mst/vendor')->with('status', 'success input master vendor');
+
     }
 
 
@@ -389,7 +393,6 @@ public function storeUpdate(Request $request)
         }
 
         public function approval(Request $request) {
-
             // Validate the request if needed
             $request->validate([
                 'id' => 'required|integer', // Ensure id is provided and is an integer
@@ -418,15 +421,45 @@ public function storeUpdate(Request $request)
             $approverName = $latestApproval && $latestApproval->approver ? $latestApproval->approver->name : 'Unknown Approver';
 
             // Check if the vendor change has already been approved by the current level
-            if ($latestApproval && $latestApproval->approval_level == $vendorChange->approval_level) {
-                return redirect()->back()->with('failed', 'Master Has Been Approved by ' . $approverName);
-            } elseif ($vendorChange->approval_level > $levelUser) {
-                return redirect()->back()->with('failed', 'Master Has Been Approved by ' . $approverName);
+            if ($latestApproval && $latestApproval->approval_level == $vendorChange->level) {
+                return redirect()->back()->with('failed', 'Master Has Been '.$latestApproval->approval_action.' by '. $approverName);
+            } elseif ($vendorChange->level > $levelUser) {
+                return redirect()->back()->with('failed', 'Master Has Been '.$latestApproval->approval_action.' by '. $approverName);
+            }elseif( $vendorChange->level !=  $levelUser){
+                return redirect()->back()->with('failed', 'Master Has Been '.$latestApproval->approval_action.' by '. $approverName);
             }
 
-            // Increment the approval level and update the status
-            $vendorChange->approval_level += 1;
-            $vendorChange->status = 'checked'; // Assuming 'status' is the field to update
+
+            // Determine the next approval level
+            if ($request->action === 'checked') {
+                $nextApprovalLevel = $vendorChange->level + 1;
+                $latestApproval->approval_level = $vendorChange->level;
+            } elseif ($request->action === 'remand') {
+                $nextApprovalLevel = $vendorChange->level - 1;
+                $latestApproval->approval_level =  $vendorChange->level;
+            } else {
+                // Handle other cases if needed
+                $nextApprovalLevel = $vendorChange->level; // Default to current level
+            }
+
+            // Fetch the user's department
+            $userDept = Auth::user()->dept; // User department should be based on the submitter, not the approver
+            $userName = Auth::user()->username;
+              // Determine the next approval route
+              if ( $vendorChange->level  < 1) {
+                $approvalRoute = ApprovalRoute::where('dept', $userDept)
+                    ->where('requester',$userName)
+                    ->where('level', $nextApprovalLevel)->get();
+            }elseif($vendorChange->level  < 2){
+                $approvalRoute = ApprovalRoute::where('dept', $userDept)
+                ->where('level', $nextApprovalLevel)->get();
+            }
+             else {
+                $approvalRoute = ApprovalRoute::where('level', $nextApprovalLevel)->get();
+            }
+            // Update the vendor change level
+            $vendorChange->level = $nextApprovalLevel;
+            $vendorChange->status = $request->action; // Assuming 'status' is the field to update
             $vendorChange->save();
 
             // Create a new approval log entry in approval_log_vendor table
@@ -436,39 +469,54 @@ public function storeUpdate(Request $request)
             $approvalLog->approval_action = $request->action;
             $approvalLog->approval_comments = $request->remarks;
             $approvalLog->approval_timestamp = now()->toDateTimeString(); // Current timestamp
-            $approvalLog->approval_level = $vendorChange->approval_level; // Use the updated approval level
+            $approvalLog->approval_level = $latestApproval->approval_level; // Use the updated approval level
             $approvalLog->save();
-
-            // Fetch the user's department
-            $userDept = Auth::user()->dept;//userdepartmentnya yang approve harusnya based on yang submitter bukan yang login
-
-            // Determine the next approval route
-            if ($vendorChange->approval_level <= 2) {
-                $approvalRoute = ApprovalRoute::where('dept', $userDept)
-                ->where('level', $vendorChange->approval_level)->get();
-                dd($approvalRoute);
-            } else {
-                $approvalRoute = ApprovalRoute::where('level', $vendorChange->approval_level)->get();
-            }
-
-
 
             // Fetch the vendor master record
             $vendorMaster = VendorMaster::where('id', $request->id)->first();
 
-            // Send approval email to each approver in the route
-            foreach ($approvalRoute as $route) {
-                $approverEmail = $route->email;
-                $approvalName = $route->name;
-                $approvalLink = url("/vendor/checked/" . encrypt($vendorMaster->id));
+            // If the action is remand, send email to previous approver
+            if ($request->action === 'remand') {
+                // Fetch the approval log for the previous level
+                    $previousApproval = ApprovalLogVendor::where('vendor_change_id', $vendorChange->id)
+                    ->where('approval_level', $vendorChange->level)
+                    ->latest('approval_timestamp')
+                    ->first();
 
-                // Send email
-                Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink, $approvalName));
+                if ($previousApproval) {
+                    $previousApprover = User::find($previousApproval->approver_id);
+                    if ($previousApprover) {
+                        $remandEmail = $previousApprover->email;
+                        $remandName = $previousApprover->name;
+                        $remandLink = url("/vendor/checked/" . encrypt($vendorMaster->id));
+
+                        // Send remand email
+                        Mail::to($remandEmail)->send(new VendorRemandMail($vendorMaster, $remandLink, $remandName, $request->remarks));
+                    }
+                }
+            } else {
+                // Send approval email to each approver in the route
+                foreach ($approvalRoute as $route) {
+                    $approverEmail = $route->email;
+                    $approvalName = $route->name;
+                    $approvalLink = url("/vendor/checked/" . encrypt($vendorMaster->id));
+
+                    // Send email
+                    Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink, $approvalName));
+                }
             }
 
+
             // Redirect or return response as needed
-            return redirect()->back()->with('status', 'Approval processed successfully.');
+            if ($request->action === 'remand') {
+                return redirect()->back()->with('status', 'Remand processed successfully.');
+            } else {
+                return redirect()->back()->with('status', 'Approval processed successfully.');
+            }
         }
+
+
+
 
 
 
