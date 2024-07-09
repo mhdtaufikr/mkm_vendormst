@@ -40,6 +40,6 @@ class VendorRemandMail extends Mailable
     public function build()
     {
         return $this->subject('Vendor Remand Notification')
-                    ->view('emails.vendor_remand');
+                    ->markdown('emails.vendor_remand');
     }
 }

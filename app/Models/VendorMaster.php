@@ -24,4 +24,14 @@ class VendorMaster extends Model
     {
         return $this->hasOne(VendorChange::class, 'vendor_id')->latest();
     }
+
+    public function logs() {
+        return $this->hasMany(ApprovalLogVendor::class, 'vendor_change_id', 'id');
+    }
+    public function vendorChanges()
+    {
+        return $this->hasMany(VendorChange::class, 'vendor_id', 'id');
+    }
+
+
 }

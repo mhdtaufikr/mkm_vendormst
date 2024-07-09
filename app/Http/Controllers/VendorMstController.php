@@ -13,22 +13,25 @@ use App\Models\ApprovalRoute;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VendorApprovalMail;
+use App\Mail\VendorCompletionMail;
+use App\Mail\VendorFormPDFMail;
 use App\Mail\VendorRemandMail;
+use App\Mail\VendorFormCompleted;
 use Carbon\Carbon;
-
+use PDF;
+use Illuminate\Support\Facades\Log;
 
 class VendorMstController extends Controller
 {
-    public function index(){
+    public function index() {
         // Fetch all vendor masters with their current status
-        $item = VendorMaster::get();
+        $item = VendorMaster::with(['vendorChanges.logs.approver'])->get();
         $dropdown = Dropdown::where('category', 'Form')
                     ->orderBy('name_value', 'asc')
                     ->get();
 
-        return view('vendor.list', compact('item','dropdown'));
+        return view('vendor.list', compact('item', 'dropdown'));
     }
-
     public function form() {
         $vendorAG = Dropdown::where('category', 'Vendor AG')->get();
         $types = Dropdown::where('category', 'Type')->get();
@@ -191,6 +194,8 @@ class VendorMstController extends Controller
         $title = Dropdown::where('category', 'Title')->get();
         $response = Http::get('https://restcountries.com/v3.1/all');
         $countries = $response->json();
+        $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
+
 
         // Sort countries alphabetically by name
         usort($countries, function($a, $b) {
@@ -212,9 +217,6 @@ class VendorMstController extends Controller
             return strcasecmp($a['name'], $b['name']);
         });
 
-        // Retrieve the vendor master data along with the latest change
-        $data = VendorMaster::with(['latestChange'])->where('id', $id)->first();
-
         // Convert the account_group string to an array
         $data->account_group = explode(',', $data->account_group);
 
@@ -230,6 +232,7 @@ class VendorMstController extends Controller
     $title = Dropdown::where('category', 'Title')->get();
     $response = Http::get('https://restcountries.com/v3.1/all');
     $countries = $response->json();
+    $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
 
     // Sort countries alphabetically by name
     usort($countries, function($a, $b) {
@@ -250,9 +253,6 @@ class VendorMstController extends Controller
     usort($currencyArray, function($a, $b) {
         return strcasecmp($a['name'], $b['name']);
     });
-
-    // Retrieve the vendor master data along with the latest change
-    $data = VendorMaster::with(['latestChange'])->where('id', $id)->first();
 
     // Convert the account_group string to an array
     $data->account_group = explode(',', $data->account_group);
@@ -362,12 +362,12 @@ public function storeUpdate(Request $request)
             $title = Dropdown::where('category', 'Title')->get();
             $response = Http::get('https://restcountries.com/v3.1/all');
             $countries = $response->json();
-
+            $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
             // Sort countries alphabetically by name
             usort($countries, function($a, $b) {
                 return strcasecmp($a['name']['common'], $b['name']['common']);
             });
-
+            $latestLevel = VendorChange::where('vendor_id',$id)->first()->level;
             // Fetch currencies from API
             $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
             $currencies = $currencyResponse->json();
@@ -383,13 +383,11 @@ public function storeUpdate(Request $request)
                 return strcasecmp($a['name'], $b['name']);
             });
 
-            // Retrieve the vendor master data along with the latest change
-            $data = VendorMaster::with(['latestChange'])->where('id', $id)->first();
 
             // Convert the account_group string to an array
             $data->account_group = explode(',', $data->account_group);
 
-            return view('vendor.checked', compact('data','vendorAG', 'tax', 'types', 'title', 'countries', 'currencyArray'));
+            return view('vendor.checked', compact('data','vendorAG', 'tax', 'types', 'title', 'countries', 'currencyArray','latestLevel'));
         }
 
         public function approval(Request $request) {
@@ -422,13 +420,12 @@ public function storeUpdate(Request $request)
 
             // Check if the vendor change has already been approved by the current level
             if ($latestApproval && $latestApproval->approval_level == $vendorChange->level) {
-                return redirect()->back()->with('failed', 'Master Has Been '.$latestApproval->approval_action.' by '. $approverName);
+                return redirect()->back()->with('failed', 'Master Has Been ' . $latestApproval->approval_action . ' by ' . $approverName);
             } elseif ($vendorChange->level > $levelUser) {
-                return redirect()->back()->with('failed', 'Master Has Been '.$latestApproval->approval_action.' by '. $approverName);
-            }elseif( $vendorChange->level !=  $levelUser){
-                return redirect()->back()->with('failed', 'Master Has Been '.$latestApproval->approval_action.' by '. $approverName);
+                return redirect()->back()->with('failed', 'Master Has Been ' . $latestApproval->approval_action . ' by ' . $approverName);
+            } elseif ($vendorChange->level != $levelUser) {
+                return redirect()->back()->with('failed', 'Master Has Been ' . $latestApproval->approval_action . ' by ' . $approverName);
             }
-
 
             // Determine the next approval level
             if ($request->action === 'checked') {
@@ -436,7 +433,7 @@ public function storeUpdate(Request $request)
                 $latestApproval->approval_level = $vendorChange->level;
             } elseif ($request->action === 'remand') {
                 $nextApprovalLevel = $vendorChange->level - 1;
-                $latestApproval->approval_level =  $vendorChange->level;
+                $latestApproval->approval_level = $vendorChange->level;
             } else {
                 // Handle other cases if needed
                 $nextApprovalLevel = $vendorChange->level; // Default to current level
@@ -445,18 +442,19 @@ public function storeUpdate(Request $request)
             // Fetch the user's department
             $userDept = Auth::user()->dept; // User department should be based on the submitter, not the approver
             $userName = Auth::user()->username;
-              // Determine the next approval route
-              if ( $vendorChange->level  < 1) {
+
+            // Determine the next approval route
+            if ($vendorChange->level < 1) {
                 $approvalRoute = ApprovalRoute::where('dept', $userDept)
-                    ->where('requester',$userName)
+                    ->where('requester', $userName)
                     ->where('level', $nextApprovalLevel)->get();
-            }elseif($vendorChange->level  < 2){
+            } elseif ($vendorChange->level < 2) {
                 $approvalRoute = ApprovalRoute::where('dept', $userDept)
-                ->where('level', $nextApprovalLevel)->get();
-            }
-             else {
+                    ->where('level', $nextApprovalLevel)->get();
+            } else {
                 $approvalRoute = ApprovalRoute::where('level', $nextApprovalLevel)->get();
             }
+
             // Update the vendor change level
             $vendorChange->level = $nextApprovalLevel;
             $vendorChange->status = $request->action; // Assuming 'status' is the field to update
@@ -478,7 +476,7 @@ public function storeUpdate(Request $request)
             // If the action is remand, send email to previous approver
             if ($request->action === 'remand') {
                 // Fetch the approval log for the previous level
-                    $previousApproval = ApprovalLogVendor::where('vendor_change_id', $vendorChange->id)
+                $previousApproval = ApprovalLogVendor::where('vendor_change_id', $vendorChange->id)
                     ->where('approval_level', $vendorChange->level)
                     ->latest('approval_timestamp')
                     ->first();
@@ -495,17 +493,29 @@ public function storeUpdate(Request $request)
                     }
                 }
             } else {
-                // Send approval email to each approver in the route
-                foreach ($approvalRoute as $route) {
-                    $approverEmail = $route->email;
-                    $approvalName = $route->name;
-                    $approvalLink = url("/vendor/checked/" . encrypt($vendorMaster->id));
+                // If the next level is 8, mark as completed and notify
+                if ($nextApprovalLevel == 8) {
+                    // Mark as completed
+                    $vendorChange->status = 'completed';
+                    $vendorChange->save();
 
-                    // Send email
-                    Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink, $approvalName));
+                    // Notify level 7 user and the submitter
+                    /* $this->notifyCompletion($vendorChange, $vendorMaster, $userDept, $userName); */
+
+                    // Generate and send PDF
+                    $this->generateAndSendPDF($vendorChange, $vendorMaster, $userDept, $userName);
+                } else {
+                    // Send approval email to each approver in the route
+                    foreach ($approvalRoute as $route) {
+                        $approverEmail = $route->email;
+                        $approvalName = $route->name;
+                        $approvalLink = url("/vendor/checked/" . encrypt($vendorMaster->id));
+
+                        // Send email
+                        Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink, $approvalName));
+                    }
                 }
             }
-
 
             // Redirect or return response as needed
             if ($request->action === 'remand') {
@@ -515,8 +525,54 @@ public function storeUpdate(Request $request)
             }
         }
 
+        private function notifyCompletion($vendorChange, $vendorMaster, $userDept, $userName) {
+            // Fetch level 7 users
+            $level7Users = User::where('level', 7)->get();
+            $submitter = User::find($vendorChange->created_by);
 
+            foreach ($level7Users as $user) {
+                Mail::to($user->email)->send(new VendorCompletionMail($vendorMaster, $user->name));
+            }
 
+            if ($submitter) {
+                Mail::to($submitter->email)->send(new VendorCompletionMail($vendorMaster, $submitter->name));
+            }
+        }
+
+        private function generateAndSendPDF($vendorChange, $vendorMaster, $userDept, $userName) {
+            try {
+                // Generate the PDF content
+                $pdf = PDF::loadView('vendor.pdf', compact('vendorChange', 'vendorMaster', 'userDept', 'userName'));
+                $output = $pdf->output();
+
+                // Define the path where the PDF will be saved
+                $pdfDirectory = public_path('pdf');
+                $pdfPath = $pdfDirectory . '/' . $vendorMaster->id . '.pdf';
+
+                // Ensure the directory exists
+                if (!file_exists($pdfDirectory)) {
+                    mkdir($pdfDirectory, 0755, true);
+                }
+
+                // Save the PDF file to the specified location
+                file_put_contents($pdfPath, $output);
+
+                // Retrieve the submitter's email address
+                $submitter = User::find($vendorChange->created_by);
+                if ($submitter) {
+                    $submitterEmail = $submitter->email;
+
+                    // Send the email with the PDF attached
+                    Mail::to($submitterEmail)->send(new VendorFormCompleted($vendorMaster, $vendorChange, $pdfPath));
+                } else {
+                    Log::error('Submitter not found for vendor change ID: ' . $vendorChange->id);
+                }
+
+            } catch (\Exception $e) {
+                // Log the error message
+                Log::error('Error sending email: ' . $e->getMessage());
+            }
+        }
 
 
 

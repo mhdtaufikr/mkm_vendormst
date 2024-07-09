@@ -21,7 +21,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
-                            <div class="card">
+                            <div class="card mb-4">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h3 class="card-title m-0">Vendor Master Form</h3>
                                     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#actionModal">
@@ -61,7 +61,7 @@
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                         <button type="submit" class="btn btn-primary">Submit</button>
                                                     </div>
-                                                </form>
+
                                             </div>
                                         </div>
                                     </div>
@@ -133,32 +133,29 @@
 
                                         <!-- Your existing form HTML -->
 
-<!-- Modal HTML -->
-<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="validationModalLabel">Form Incomplete</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Please fill out all required fields.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-                                    <form novalidate method="POST" action="{{ url('/vendor/store') }}">
-                                        @csrf
-                                        <h3><strong>Vendor Master Request Form</strong></h3>
-                                        <div class="row">
-                                            <!-- Your existing form fields go here -->
+                                        <!-- Modal HTML -->
+                                        <div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="validationModalLabel">Form Incomplete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                Please fill out all required fields.
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                            </div>
                                         </div>
-                                        <hr class="my-4">
+
+                                            <h3><strong>Vendor Master Request Form</strong></h3>
+                                            <div class="row">
+                                                <!-- Your existing form fields go here -->
+                                            </div>
+                                            <hr class="my-4">
 
                                         <!-- Tabs navigation -->
                                         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -195,9 +192,22 @@
                                                         <div class="col-md-6">
                                                             <div class="col-md-12 mb-3">
                                                                 <label for="vendor_account_number" class="form-label">Vendor Account Number</label>
-                                                                <input readonly value="{{$data->vendor_account_number}}" type="text" class="form-control" id="vendor_account_number" name="vendor_account_number" required>
+                                                                <input
+                                                                    value="{{ $data->vendor_account_number }}"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    id="vendor_account_number"
+                                                                    name="vendor_account_number"
+                                                                    required
+                                                                    @if(Auth::user()->level != 5)
+                                                                        readonly
+                                                                    @endif
+                                                                >
+
+
                                                                 <small class="text-danger form-text">(Enter vendor account number only for vendor employee and vendor inter company)</small>
                                                             </div>
+                                                        </form>
                                                             <label class="form-label">Account Group</label><br>
                                                                 <div class="row">
                                                                     @foreach($vendorAG as $index => $group)
@@ -542,11 +552,67 @@
                                            {{--  <button type="submit" class="btn btn-primary mt-3">Submit</button> --}}
                                         </div>
 
-                                    </form>
                                 </div>
                                 <!-- /.card-body -->
                             </div>
                             <!-- /.card -->
+
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title m-0">Log Form</h3>
+
+                                </div>
+                                <div class="card-body">
+                                    <!-- Display Vendor Master Details -->
+                                    <h2>{{ $data->vendor_name }}</h2>
+                                    <p>Vendor Account Number: {{ $data->vendor_account_number }}</p>
+                                    <!-- Display other details as needed -->
+
+                                    <!-- Display Latest Change Details -->
+                                    @if ($data->latestChange)
+                                        <h3>Latest Change Details</h3>
+                                        <p>Change Type: {{ $data->latestChange->change_type }}</p>
+                                        <!-- Display other details from latest change -->
+                                    @endif
+
+                                    <!-- Display Logs -->
+                                    @if ($data->latestChange && $data->latestChange->logs->isNotEmpty())
+                                        <h3>Logs</h3>
+                                        <table id="tableUser" class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Approver</th>
+                                                    <th>Action</th>
+                                                    <th>Comments</th>
+                                                    <th>Timestamp</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($data->latestChange->logs as $log)
+                                                    <tr class="
+                                                    @if($log->approval_action === 'checked')
+                                                        table-success
+                                                    @elseif($log->approval_action === 'remand')
+                                                        table-danger
+                                                    @elseif($log->approval_action === 'Submitter')
+                                                        table-primary
+                                                    @endif
+                                                ">
+                                                        <td>{{ $log->approver->name }}</td>
+                                                        <td>{{ $log->approval_action }}</td>
+                                                        <td>{{ $log->approval_comments }}</td>
+                                                        <td> {{ date('j F Y, H:i', strtotime($log->approval_timestamp)) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    @else
+                                        <p>No logs found for this vendor master.</p>
+                                    @endif
+
+                                </div>
+                            </div>
+
                         </div>
                         <!-- /.col -->
                     </div>
@@ -566,10 +632,14 @@
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,
-            // "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            "order": [], // Disable initial sorting
+            "columnDefs": [
+                { "targets": 'no-sort', "orderable": false } // Disable sorting on specific columns
+            ]
         });
     });
 </script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const npwpInput = document.getElementById('npwp');
