@@ -191,5 +191,37 @@
             <td colspan="3">{{ $vendorChange->updated_at }}</td>
         </tr>
     </table>
+
+    @if($vendorMaster->file)
+        <div class="page-break"></div>
+        <h3>Uploaded PDF File</h3>
+        <p>File: {{ $vendorMaster->file }}</p>
+    @endif
+
+    @if($approvalLogs->isNotEmpty())
+        <div class="page-break"></div>
+        <h3>Approval Logs</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Approver</th>
+                    <th>Action</th>
+                    <th>Comments</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($approvalLogs as $log)
+                    <tr>
+                        <td>{{ $log->approver->name }}</td>
+                        <td>{{ $log->approval_action }}</td>
+                        <td>{{ $log->approval_comments }}</td>
+                        <td>{{ $log->approval_timestamp }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
 </body>
 </html>

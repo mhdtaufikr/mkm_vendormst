@@ -88,30 +88,30 @@
                                             form.classList.add('was-validated');
                                           }, false);
                                         });
-                                        </script>
+                                    </script>
 
-                                        <!-- Your existing form HTML -->
+                                    <!-- Your existing form HTML -->
 
-                                        <!-- Modal HTML -->
-                                        <div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                    <!-- Modal HTML -->
+                                    <div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                <h5 class="modal-title" id="validationModalLabel">Form Incomplete</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <h5 class="modal-title" id="validationModalLabel">Form Incomplete</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                Please fill out all required fields.
+                                                    Please fill out all required fields.
                                                 </div>
                                                 <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                 </div>
                                             </div>
-                                            </div>
                                         </div>
+                                    </div>
 
 
-                                    <form novalidate method="POST" action="{{ url('/vendor/update/store') }}">
+                                    <form novalidate method="POST" action="{{ url('/vendor/update/store') }}" enctype="multipart/form-data">
                                         @csrf
                                         <h3><strong>Vendor Master Request Form</strong></h3>
                                         <div class="row">
@@ -148,35 +148,35 @@
                                         <!-- Tabs content -->
                                         <div class="tab-content" id="myTabContent">
 
-                                            <div class="tab-pane fade  show active" id="master" role="tabpanel" aria-labelledby="master-tab">
+                                            <div class="tab-pane fade show active" id="master" role="tabpanel" aria-labelledby="master-tab">
                                                 <div class="row">
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="col-md-12 mb-3">
                                                                 <label for="vendor_account_number" class="form-label">Vendor Account Number</label>
                                                                 <input type="text" name="id" id="" value="{{$data->id}}" hidden>
-                                                                <input value="{{$data->vendor_account_number}}" type="text" class="form-control" id="vendor_account_number" name="vendor_account_number" required>
+                                                                <input value="{{$data->vendor_account_number}}" type="text" class="form-control" id="vendor_account_number" name="vendor_account_number" >
                                                                 <small class="text-danger form-text">(Enter vendor account number only for vendor employee and vendor inter company)</small>
                                                             </div>
                                                             <label class="form-label">Account Group</label><br>
-                                                                <div class="row">
-                                                                    @foreach($vendorAG as $index => $group)
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-check form-check-inline">
-                                                                                <input
-                                                                                    class="form-check-input"
-                                                                                    type="checkbox"
-                                                                                    name="account_group[]"
-                                                                                    id="account_group_{{ $index }}"
-                                                                                    value="{{ $group->name_value }}"
-                                                                                    @if(in_array($group->name_value, $data->account_group)) checked @endif
-                                                                                >
-                                                                                <label class="form-check-label" for="account_group_{{ $index }}">{{ $group->name_value }}</label>
-                                                                            </div>
+                                                            <div class="row">
+                                                                @foreach($vendorAG as $index => $group)
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input
+                                                                                class="form-check-input"
+                                                                                type="checkbox"
+                                                                                name="account_group[]"
+                                                                                id="account_group_{{ $index }}"
+                                                                                value="{{ $group->name_value }}"
+                                                                                @if(in_array($group->name_value, $data->account_group)) checked @endif
+                                                                            >
+                                                                            <label class="form-check-label" for="account_group_{{ $index }}">{{ $group->name_value }}</label>
                                                                         </div>
-                                                                    @endforeach
-                                                                </div>
+                                                                    </div>
+                                                                @endforeach
                                                             </div>
+                                                        </div>
                                                         <div class="col-md-6">
                                                             <div class="col-md-12 mb-3">
                                                                 <label class="form-label">Change Type</label><br>
@@ -215,7 +215,7 @@
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="company_code" class="form-label">Company Code</label>
-                                                        <input value="3000" type="text" class="form-control" id="company_code" name="company_code"  required>
+                                                        <input value="3000" type="text" class="form-control" id="company_code" name="company_code" required>
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
@@ -227,7 +227,6 @@
                                             </div>
                                             <!-- Address tab -->
                                             <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label">Title<span class="text-danger">*</span></label><br>
@@ -316,7 +315,6 @@
                                             </div>
                                             <!-- Control tab -->
                                             <div class="tab-pane fade" id="control" role="tabpanel" aria-labelledby="control-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label">Tax Code<span class="text-danger">*</span></label><br>
@@ -371,7 +369,6 @@
                                             </div>
                                             <!-- Payment Control tab -->
                                             <div class="tab-pane fade" id="payment" role="tabpanel" aria-labelledby="payment-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="currency" class="form-label">Currency<span class="text-danger">*</span></label>
@@ -422,7 +419,6 @@
                                             </div>
                                             <!-- Accounting Information tab -->
                                             <div class="tab-pane fade" id="accounting" role="tabpanel" aria-labelledby="accounting-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="recon_account" class="form-label">Recon Account</label>
@@ -442,7 +438,6 @@
                                             </div>
                                             <!-- Payment Transaction tab -->
                                             <div class="tab-pane fade" id="transaction" role="tabpanel" aria-labelledby="transaction-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="payment_terms" class="form-label">Payment Terms</label>
@@ -484,16 +479,14 @@
                                                         @endforeach
                                                     </div>
 
-
-
-
-
                                                     <div class="col-md-6 mb-3">
                                                         <label for="payment_block" class="form-label">Payment Block</label>
                                                         <input type="checkbox" class="form-check-input" id="payment_block" name="payment_block"
                                                                @if($data->payment_block) checked @endif>
+                                                               <br>
+                                                               <label for="file" class="form-label">Upload File</label>
+                                                        <input name="file" type="file" class="form-control">
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -569,9 +562,6 @@
             npwpInput.value = formattedValue;
         });
     });
-    </script>
-
+</script>
 
 @endsection
-
-

@@ -88,28 +88,27 @@
                                             form.classList.add('was-validated');
                                           }, false);
                                         });
-                                        </script>
+                                    </script>
 
-                                        <!-- Your existing form HTML -->
+                                    <!-- Your existing form HTML -->
 
-                                        <!-- Modal HTML -->
-                                        <div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                    <!-- Modal HTML -->
+                                    <div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                <h5 class="modal-title" id="validationModalLabel">Form Incomplete</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <h5 class="modal-title" id="validationModalLabel">Form Incomplete</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                Please fill out all required fields.
+                                                    Please fill out all required fields.
                                                 </div>
                                                 <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                 </div>
                                             </div>
-                                            </div>
                                         </div>
-
+                                    </div>
 
                                     <form novalidate method="POST" action="{{ url('/vendor/store') }}" enctype="multipart/form-data">
                                         @csrf
@@ -142,13 +141,11 @@
                                             <li class="nav-item" role="presentation">
                                                 <button style="color: black;" class="nav-link" id="transaction-tab" data-bs-toggle="tab" data-bs-target="#transaction" type="button" role="tab" aria-controls="transaction" aria-selected="false">Vendor Payment Transaction</button>
                                             </li>
-
                                         </ul>
 
                                         <!-- Tabs content -->
                                         <div class="tab-content" id="myTabContent">
-
-                                            <div class="tab-pane fade  show active" id="master" role="tabpanel" aria-labelledby="master-tab">
+                                            <div class="tab-pane fade show active" id="master" role="tabpanel" aria-labelledby="master-tab">
                                                 <div class="row">
                                                     <div class="row">
                                                         <div class="col-md-6">
@@ -158,41 +155,34 @@
                                                                 <small class="text-danger form-text">(Enter vendor account number only for vendor employee and vendor inter company)</small>
                                                             </div>
                                                             <label class="form-label">Account Group</label><br>
-                                                                <div class="row">
-                                                                    @foreach($vendorAG as $index => $group)
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-check form-check-inline">
-                                                                                <input  class="form-check-input" type="checkbox" name="account_group[]" id="account_group_{{ $index }}" value="{{ $group->name_value }}">
-                                                                                <label class="form-check-label" for="account_group_{{ $index }}">{{ $group->name_value }}</label>
-                                                                            </div>
+                                                            <div class="row">
+                                                                @foreach($vendorAG as $index => $group)
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="checkbox" name="account_group[]" id="account_group_{{ $index }}" value="{{ $group->name_value }}">
+                                                                            <label class="form-check-label" for="account_group_{{ $index }}">{{ $group->name_value }}</label>
                                                                         </div>
-                                                                    @endforeach
-                                                                </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="col-md-12 mb-3">
-                                                                <label class="form-label">Change Type</label><br>
-
+                                                                <label class="form-label">Change Type<span class="text-danger">*</span></label><br>
                                                                 @foreach($types as $type)
                                                                     <div class="form-check form-check-inline">
                                                                         <input class="form-check-input" type="radio" name="change_type" id="{{ $type->name_value }}" value="{{ $type->name_value }}" required>
-                                                                        <label class="form-check-label" for="{{ $type->name_value }}">{{ $type->name_value }}<span class="text-danger">*</span></label>
+                                                                        <label class="form-check-label" for="{{ $type->name_value }}">{{ $type->name_value }}</label>
                                                                     </div>
                                                                 @endforeach
-
                                                                 <br>
                                                                 <label for="">Remarks / Reason :</label>
                                                                 <input type="text" class="form-control" name="Remarks" id="">
                                                             </div>
-
                                                             <div class="col-md-12 mb-3">
-                                                                <div class="col-md-12 mb-3">
-                                                                    <label for="previous_sap_vendor_number" class="form-label">Previous SAP Vendor Number</label>
-                                                                    <input type="text" class="form-control" id="previous_sap_vendor_number" name="previous_sap_vendornumber">
-                                                                </div>
-
-                                                               <small class="text-danger form-text">Note<span class="text-danger">*</span> : For Change, Block, Delete please enter the previous SAP Vendor number</small>
-
+                                                                <label for="previous_sap_vendor_number" class="form-label">Previous SAP Vendor Number</label>
+                                                                <input type="text" class="form-control" id="previous_sap_vendor_number" name="previous_sap_vendornumber">
+                                                                <small class="text-danger form-text">Note<span class="text-danger">*</span> : For Change, Block, Delete please enter the previous SAP Vendor number</small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -204,46 +194,38 @@
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="company_code" class="form-label">Company Code</label>
-                                                        <input readonly value="3000" type="text" class="form-control" id="company_code" name="company_code"  required>
+                                                        <input readonly value="3000" type="text" class="form-control" id="company_code" name="company_code" required>
                                                     </div>
-
                                                     <div class="col-md-6 mb-3">
                                                         <label for="vendor_name" class="form-label">Vendor No. Reference</label>
                                                         <input type="text" class="form-control" id="vendor_name" name="vendor_name">
                                                     </div>
                                                 </div>
-
                                             </div>
                                             <!-- Address tab -->
                                             <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label">Title<span class="text-danger">*</span></label><br>
-
                                                         @foreach($title as $item)
-                                                        <div class="form-check form-check-inline">
-
-                                                            <input class="form-check-input" type="radio" name="title" id="{{ $item->name_value }}" value="{{ $item->name_value }}" required>
-                                                            <label class="form-check-label" for="{{ $item->name_value }}">{{ $item->name_value }}<span class="text-danger">*</span></label>
-                                                        </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" name="title" id="{{ $item->name_value }}" value="{{ $item->name_value }}" required>
+                                                                <label class="form-check-label" for="{{ $item->name_value }}">{{ $item->name_value }}</label>
+                                                            </div>
                                                         @endforeach
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="name" class="form-label">Name<span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="name" name="name" required>
                                                     </div>
-
-
                                                     <div class="col-md-6 mb-3">
                                                         <label for="search_term_1" class="form-label">Search Term 1<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="search_term_1" name="search_term_1">
+                                                        <input type="text" class="form-control" id="search_term_1" name="search_term_1" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="search_term_2" class="form-label">Search Term 2</label>
                                                         <input type="text" class="form-control" id="search_term_2" name="search_term_2">
                                                     </div>
-
                                                     <div class="col-md-3 mb-3">
                                                         <label for="country" class="form-label">Country<span class="text-danger">*</span></label>
                                                         <select class="form-control" id="country" name="country" required>
@@ -253,26 +235,25 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-
                                                     <div class="col-md-3 mb-3">
                                                         <label for="region" class="form-label">Region</label>
                                                         <input type="text" class="form-control" id="region" name="region">
                                                     </div>
                                                     <div class="col-md-3 mb-3">
                                                         <label for="city" class="form-label">City<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="city" name="city">
+                                                        <input type="text" class="form-control" id="city" name="city" required>
                                                     </div>
                                                     <div class="col-md-3 mb-3">
                                                         <label for="street" class="form-label">Street<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="street" name="street">
+                                                        <input type="text" class="form-control" id="street" name="street" required>
                                                     </div>
                                                     <div class="col-md-2 mb-3">
                                                         <label for="house_number" class="form-label">Home No.<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="house_number" name="house_number">
+                                                        <input type="text" class="form-control" id="house_number" name="house_number" required>
                                                     </div>
                                                     <div class="col-md-2 mb-3">
                                                         <label for="postal_code" class="form-label">Postal Code<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="postal_code" name="postal_code">
+                                                        <input type="text" class="form-control" id="postal_code" name="postal_code" required>
                                                     </div>
                                                     <div class="col-md-1 mb-3">
                                                         <label for="po_box" class="form-label">P.O. Box</label>
@@ -284,19 +265,16 @@
                                                     </div>
                                                     <div class="col-md-3 mb-3">
                                                         <label for="telephone" class="form-label">Telephone<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="telephone" name="telephone">
+                                                        <input type="text" class="form-control" id="telephone" name="telephone" required>
                                                     </div>
                                                     <div class="col-md-3 mb-3">
                                                         <label for="email" class="form-label">Email<span class="text-danger">*</span></label>
-                                                        <input type="email" class="form-control" id="email" name="email">
+                                                        <input type="email" class="form-control" id="email" name="email" required>
                                                     </div>
-
-
                                                 </div>
                                             </div>
                                             <!-- Control tab -->
                                             <div class="tab-pane fade" id="control" role="tabpanel" aria-labelledby="control-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label">Tax Code<span class="text-danger">*</span></label><br>
@@ -313,7 +291,6 @@
                                                             <label class="form-check-label" for="no-npwp">No NPWP</label>
                                                         </div>
                                                     </div>
-
                                                     <div class="col-md-6 mb-3">
                                                         <label for="npwp" class="form-label">NPWP<span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="npwp" name="npwp" required pattern="\d{2}\.\d{3}\.\d{3}\.\d{1}-\d{3}\.\d{3}">
@@ -323,12 +300,10 @@
                                                             NPWP harus dalam format XX.XXX.XXX.X-XXX.XXX
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                             <!-- Payment Control tab -->
                                             <div class="tab-pane fade" id="payment" role="tabpanel" aria-labelledby="payment-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="currency" class="form-label">Currency<span class="text-danger">*</span></label>
@@ -339,9 +314,8 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="bank_key" class="form-label">Bank Account Number</label>
+                                                        <label for="bank_key" class="form-label">Bank Account Number<span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="bank_key" name="bank_key" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
@@ -350,11 +324,11 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="account_holder" class="form-label">Account Holder<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="account_holder" name="account_holder">
+                                                        <input type="text" class="form-control" id="account_holder" name="account_holder" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="bank_region" class="form-label">Bank Region<span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="bank_region" name="bank_region">
+                                                        <input type="text" class="form-control" id="bank_region" name="bank_region" required>
                                                     </div>
                                                     <div class="col-md-3 mb-3">
                                                         <label for="confirm_with" class="form-label">Confirm With</label>
@@ -366,7 +340,7 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="date" class="form-label">Date</label>
-                                                        <input type="date" class="form-control" id="date" name="date" required >
+                                                        <input type="date" class="form-control" id="date" name="date" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="confirmed_by" class="form-label">Confirm By</label>
@@ -376,7 +350,6 @@
                                             </div>
                                             <!-- Accounting Information tab -->
                                             <div class="tab-pane fade" id="accounting" role="tabpanel" aria-labelledby="accounting-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="recon_account" class="form-label">Recon Account</label>
@@ -396,14 +369,13 @@
                                             </div>
                                             <!-- Payment Transaction tab -->
                                             <div class="tab-pane fade" id="transaction" role="tabpanel" aria-labelledby="transaction-tab">
-
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="payment_terms" class="form-label">Payment Terms</label>
                                                         <input type="text" class="form-control" id="payment_terms" name="payment_terms">
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Payment Method</label><br>
+                                                        <label class="form-label">Payment Method<span class="text-danger">*</span></label><br>
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="payment_method" id="cash" value="cash" required>
                                                             <label class="form-check-label" for="cash">Cash</label>
@@ -428,7 +400,6 @@
                                                             </div>
                                                         @endforeach
                                                     </div>
-
                                                     <div class="col-md-6 mb-3">
                                                         <label for="payment_block" class="form-label">Payment Block</label>
                                                         <input type="checkbox" class="form-check-input mb-3" id="payment_block" name="payment_block">
@@ -436,7 +407,6 @@
                                                         <label for="">Upload File</label>
                                                         <input name="file" type="file" multiple class="form-control">
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -444,7 +414,6 @@
                                         <div class="d-flex justify-content-center">
                                             <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                         </div>
-
                                     </form>
                                 </div>
                                 <!-- /.card-body -->
@@ -512,8 +481,6 @@
             npwpInput.value = formattedValue;
         });
     });
-    </script>
+</script>
 
 @endsection
-
-
