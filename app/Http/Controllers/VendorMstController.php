@@ -194,42 +194,42 @@ class VendorMstController extends Controller
 
 
 
-    public function update($id){
-        $id = decrypt($id);
-        $vendorAG = Dropdown::where('category', 'Vendor AG')->get();
-        $types = Dropdown::where('category', 'Type')->get();
-        $tax = Dropdown::where('category', 'Withholding Tax')->get();
-        $title = Dropdown::where('category', 'Title')->get();
-        $response = Http::get('https://restcountries.com/v3.1/all');
-        $countries = $response->json();
-        $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
+public function update($id){
+    $id = decrypt($id);
+    $vendorAG = Dropdown::where('category', 'Vendor AG')->get();
+    $types = Dropdown::where('category', 'Type')->get();
+    $tax = Dropdown::where('category', 'Withholding Tax')->get();
+    $title = Dropdown::where('category', 'Title')->get();
+    $response = Http::get('https://restcountries.com/v3.1/all');
+    $countries = $response->json();
+    $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
 
 
-        // Sort countries alphabetically by name
-        usort($countries, function($a, $b) {
-            return strcasecmp($a['name']['common'], $b['name']['common']);
-        });
+    // Sort countries alphabetically by name
+    usort($countries, function($a, $b) {
+        return strcasecmp($a['name']['common'], $b['name']['common']);
+    });
 
-        // Fetch currencies from API
-        $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
-        $currencies = $currencyResponse->json();
+    // Fetch currencies from API
+    $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
+    $currencies = $currencyResponse->json();
 
-        // Convert the currencies object to an array of [code, name] pairs
-        $currencyArray = [];
-        foreach ($currencies as $code => $name) {
-            $currencyArray[] = ['code' => $code, 'name' => $name];
-        }
-
-        // Sort the array alphabetically by currency name
-        usort($currencyArray, function($a, $b) {
-            return strcasecmp($a['name'], $b['name']);
-        });
-
-        // Convert the account_group string to an array
-        $data->account_group = explode(',', $data->account_group);
-
-        return view('vendor.update', compact('data','vendorAG', 'tax', 'types', 'title', 'countries', 'currencyArray'));
+    // Convert the currencies object to an array of [code, name] pairs
+    $currencyArray = [];
+    foreach ($currencies as $code => $name) {
+        $currencyArray[] = ['code' => $code, 'name' => $name];
     }
+
+    // Sort the array alphabetically by currency name
+    usort($currencyArray, function($a, $b) {
+        return strcasecmp($a['name'], $b['name']);
+    });
+
+    // Convert the account_group string to an array
+    $data->account_group = explode(',', $data->account_group);
+
+    return view('vendor.update', compact('data','vendorAG', 'tax', 'types', 'title', 'countries', 'currencyArray'));
+}
 
     public function detail($id)
 {
@@ -619,17 +619,17 @@ public function approval(Request $request)
 
 
         private function notifyCompletion($vendorChange, $vendorMaster, $userDept, $userName) {
-            // Fetch level 7 users
-            $level7Users = User::where('level', 7)->get();
-            $submitter = User::find($vendorChange->created_by);
+                // Fetch level 7 users
+                $level7Users = User::where('level', 7)->get();
+                $submitter = User::find($vendorChange->created_by);
 
-            foreach ($level7Users as $user) {
-                Mail::to($user->email)->send(new VendorCompletionMail($vendorMaster, $user->name));
-            }
+                foreach ($level7Users as $user) {
+                    Mail::to($user->email)->send(new VendorCompletionMail($vendorMaster, $user->name));
+                }
 
-            if ($submitter) {
-                Mail::to($submitter->email)->send(new VendorCompletionMail($vendorMaster, $submitter->name));
-            }
+                if ($submitter) {
+                    Mail::to($submitter->email)->send(new VendorCompletionMail($vendorMaster, $submitter->name));
+                }
         }
 
         private function generateAndSendPDF($vendorChange, $vendorMaster, $userDept, $userName) {
@@ -669,8 +669,5 @@ public function approval(Request $request)
                 Log::error('Error sending email: ' . $e->getMessage());
             }
         }
-
-
-
 
 }

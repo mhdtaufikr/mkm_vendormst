@@ -47,6 +47,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mst/customer', [CustomerMstController::class, 'index']);
     Route::get('/mst/customer/form', [CustomerMstController::class, 'form']);
     Route::post('/customer/store', [CustomerMstController::class, 'store']);
+    Route::get('/customer/checked/{id}', [CustomerMstController::class, 'checked']);
+    Route::post('/customer/approval', [CustomerMstController::class, 'approval']);
 
     //Dropdown Controller
      Route::get('/dropdown', [DropdownController::class, 'index'])->middleware(['checkRole:IT']);
