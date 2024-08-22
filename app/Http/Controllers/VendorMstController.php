@@ -643,7 +643,7 @@ public function approval(Request $request)
 
                 // Define the path where the PDF will be saved
                 $pdfDirectory = public_path('pdf');
-                $pdfPath = $pdfDirectory . '/' . $vendorMaster->id . '.pdf';
+                $pdfPath = $pdfDirectory . '/' . $vendorMaster->vendor_account_number . '.pdf';
 
                 // Ensure the directory exists
                 if (!file_exists($pdfDirectory)) {

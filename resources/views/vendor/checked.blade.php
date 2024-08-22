@@ -24,8 +24,8 @@
                             <div class="card mb-4">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h3 class="card-title m-0">Vendor Master Form</h3>
-                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#actionModal">
-                                        Submit
+                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#actionModal">
+                                        Approve
                                     </button>
                                 </div>
                               <!-- Modal -->
@@ -74,7 +74,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-success">Approve</button>
                     </div>
 
             </div>
@@ -332,11 +332,11 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label for="bank_key" class="form-label">Bank Key</label>
+                                                <label for="bank_key" class="form-label">Bank Account Number<span class="text-danger">*</span></label>
                                                 <input readonly value="{{$data->bank_key}}" type="text" class="form-control" id="bank_key" name="bank_key" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label for="bank_account" class="form-label">Bank Account<span class="text-danger">*</span></label>
+                                                <label for="bank_account" class="form-label">Bank Name<span class="text-danger">*</span></label>
                                                 <input readonly value="{{$data->bank_account}}" type="text" class="form-control" id="bank_account" name="bank_account" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
@@ -422,7 +422,7 @@
                                         </div>
 
                                         <div class="d-flex justify-content-center">
-                                            {{--  <button type="submit" class="btn btn-primary mt-3">Submit</button> --}}
+                                            {{--  <button type="submit" class="btn btn-success mt-3">Approve</button> --}}
                                         </div>
 
                                 </div>

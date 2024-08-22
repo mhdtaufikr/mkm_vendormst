@@ -69,7 +69,7 @@
                                     @endif
 
                                     <!--alert success -->
-                                    <h1 class="text-center font-weight-bold mb-4">MKM Vendor & Csutomer Master</h1>
+                                    <h1 class="text-center font-weight-bold mb-4">MKM Vendor & Customer Master</h1>
 
                                     <!-- Login form-->
                                     <form action="{{ url('auth/login') }}" method="POST" enctype="multipart/form-data">

@@ -344,7 +344,7 @@
                                                 </div>
 
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="bank_key" class="form-label">Bank Key</label>
+                                                    <label for="bank_key" class="form-label">Bank Acoount Number</label>
                                                     <input readonly value="{{$data->bank_key}}" type="text" class="form-control" id="bank_key" name="bank_key" required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
