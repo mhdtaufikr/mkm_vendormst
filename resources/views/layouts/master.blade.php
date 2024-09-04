@@ -49,8 +49,8 @@
         <!-- Include Chosen CSS -->
         <link href="{{asset('chosen/chosen.min.css')}}" rel="stylesheet" />
 
-         <!-- Include Chart CSS -->
-         <script src="{{asset('canvasjs.min.js')}}"></script>
+        <!-- Include Chart CSS -->
+        <script src="{{asset('canvasjs.min.js')}}"></script>
 
         <!-- Include Chosen JS -->
         <script src="{{asset('chosen/chosen.jquery.min.js')}}"></script>
@@ -65,9 +65,18 @@
                 @include('layouts.includes._sidebar')
                     <div id="layoutSidenav_content">
                         @yield('content')
-                        @include('layouts.includes._footer')
+                        <footer class="footer-admin mt-auto footer-light">
+                            <div class="container-xl px-4">
+                                <div class="row">
+                                    <div class="col-md-6 small"></div>
+                                    <div class="col-md-6 text-md-end small">
+                                        Copyright PT Mitsubishi Krama Yudha Motors and Manufacturing&copy; 2023
+                                    </div>
+                                </div>
+                            </div>
+                        </footer>
                     </div>
-            </div>
+                </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src={{asset('assets/js/scripts.js')}} ></script>
     </body>

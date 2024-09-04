@@ -21,5 +21,9 @@ class CustomerChange extends Model
     {
         return $this->hasMany(ApprovalLogCustomer::class, 'customer_change_id', 'id');
     }
+    public function approvalLogs()
+    {
+        return $this->hasMany(ApprovalLogCustomer::class, 'customer_change_id', 'id');
+    }
 }
 

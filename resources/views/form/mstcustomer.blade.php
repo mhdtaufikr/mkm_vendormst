@@ -404,14 +404,12 @@
                                                         <br>
                                                         <label for="">Upload File</label>
                                                         <input name="file" type="file" multiple class="form-control">
+                                                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="d-flex justify-content-center">
-                                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
-                                        </div>
                                     </form>
                                 </div>
                                 <!-- /.card-body -->

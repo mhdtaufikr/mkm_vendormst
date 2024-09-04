@@ -8,7 +8,7 @@
 <body>
     <h2>Vendor Approval Required</h2>
     <p>
-        Dear {{$approvalName }},
+        Dear Sir/Madam {{$approvalName }},
     </p>
     <p>
         You are required to review and approve the vendor submission "{{$vendorMaster->name}}". Please click the link below to proceed:

@@ -126,7 +126,8 @@
                     <th>No</th>
                     <th>Vendor Name</th>
                     <th>Vendor Account Number</th>
-                    <th>Status</th>
+                    <th>Log Comments</th>
+                    <th>Approver Name</th>
                     <th>Action</th>
                   </tr>
                   </thead>
@@ -138,23 +139,10 @@
                     <tr>
                         <td>{{ $no++ }}</td>
                         <td>{{ $data->name }}</td>
-                        <td>{{ $data->vendor_account_number }}</td>
-                        @php
-                            $data->status = 'Available';
-                        @endphp
-                        <td>
-                            @if($data->status == 'Available')
-                                <span class="btn btn-sm btn-success">Available</span>
-                            @elseif($data->status == 'Borrowed')
-                                <span class="btn btn-sm btn-warning">Borrowed</span>
-                            @elseif($data->status == 'Maintenance')
-                                <span class="btn btn-sm btn-info">Maintenance</span>
-                            @elseif($data->status == 'Lost')
-                                <span class="btn btn-sm btn-danger">Lost</span>
-                            @else
-                                <span class="btn btn-sm btn-secondary">{{ $data->status }}</span>
-                            @endif
-                        </td>
+                        <td>{{ $data->vendor_account_number ?? 'Unregistered' }}</td>
+                        <td>{{ $data->vendorChanges->last()->logs->last()->approval_comments ?? 'No comments' }}</td>
+                        <td>{{ $data->vendorChanges->last()->logs->last()->approver->name ?? 'No approver' }}</td>
+
                         <td>
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

@@ -8,7 +8,7 @@
 <body>
     <h2>Vendor Remand Notification</h2>
     <p>
-        Dear {{ $remandName }},
+        Dear Sir/Madam {{ $remandName }},
     </p>
     <p>
         The vendor record for "{{ $vendorMaster->name }}" has been remanded with the following remarks:

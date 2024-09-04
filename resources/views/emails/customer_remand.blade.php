@@ -1,7 +1,7 @@
 @component('mail::message')
 # Customer Remand Notification
 
-Dear {{ $remandName }},
+Dear Sir/Madam {{ $remandName }},
 
 The customer {{ $customerMaster->customer_name }} has been remanded for the following reason:
 
@@ -15,5 +15,4 @@ Review Customer
 @endcomponent
 
 Thanks,<br>
-{{ config('app.name') }}
 @endcomponent

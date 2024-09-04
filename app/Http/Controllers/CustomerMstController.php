@@ -22,15 +22,17 @@ use Illuminate\Support\Facades\Log;
 class CustomerMstController extends Controller
 {
     public function index()
-    {
-        // Fetch all customer masters with their current status
-        $item = CustomerMaster::get();
-        $dropdown = Dropdown::where('category', 'Form')
-                    ->orderBy('name_value', 'asc')
-                    ->get();
+{
+    // Fetch all customer masters with their current status and approval logs
+    $item = CustomerMaster::with(['changes.approvalLogs.approver'])->get();
 
-        return view('master.list', compact('item', 'dropdown'));
-    }
+    $dropdown = Dropdown::where('category', 'Form')
+                ->orderBy('name_value', 'asc')
+                ->get();
+
+    return view('master.list', compact('item', 'dropdown'));
+}
+
 
     public function form()
     {
@@ -198,79 +200,86 @@ class CustomerMstController extends Controller
     return redirect('/mst/customer')->with('status', 'success input master customer');
 }
 
-    public function update($id)
-    {
-        $id = decrypt($id);
-        $customerAG = Dropdown::where('category', 'Customer AG')->get();
-        $types = Dropdown::where('category', 'Type')->get();
-        $tax = Dropdown::where('category', 'Withholding Tax')->get();
-        $title = Dropdown::where('category', 'Title')->get();
-        $response = Http::get('https://restcountries.com/v3.1/all');
-        $countries = $response->json();
-        $data = CustomerMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
+public function update($id)
+{
+    $id = decrypt($id);
 
-        // Sort countries alphabetically by name
-        usort($countries, function ($a, $b) {
-            return strcasecmp($a['name']['common'], $b['name']['common']);
-        });
+    // Fetch dropdown data for the form
+    $customerAG = Dropdown::where('category', 'Customer AG')->get();
+    $types = Dropdown::where('category', 'Type')->get();
+    $tax = Dropdown::where('category', 'Withholding Tax')->get();
+    $title = Dropdown::where('category', 'Title')->get();
 
-        // Fetch currencies from API
-        $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
-        $currencies = $currencyResponse->json();
+    // Fetch country data from API
+    $response = Http::get('https://restcountries.com/v3.1/all');
+    $countries = $response->json();
 
-        // Convert the currencies object to an array of [code, name] pairs
-        $currencyArray = [];
-        foreach ($currencies as $code => $name) {
-            $currencyArray[] = ['code' => $code, 'name' => $name];
-        }
+    // Sort countries alphabetically by name
+    usort($countries, function($a, $b) {
+        return strcasecmp($a['name']['common'], $b['name']['common']);
+    });
 
-        // Sort the array alphabetically by currency name
-        usort($currencyArray, function ($a, $b) {
-            return strcasecmp($a['name'], $b['name']);
-        });
+    // Fetch currencies from API
+    $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
+    $currencies = $currencyResponse->json();
 
-        // Convert the account_group string to an array
-        $data->account_group = explode(',', $data->account_group);
-
-        return view('customer.update', compact('data', 'customerAG', 'tax', 'types', 'title', 'countries', 'currencyArray'));
+    // Convert the currencies object to an array of [code, name] pairs
+    $currencyArray = [];
+    foreach ($currencies as $code => $name) {
+        $currencyArray[] = ['code' => $code, 'name' => $name];
     }
 
-    public function detail($id)
-    {
-        $id = decrypt($id);
-        $customerAG = Dropdown::where('category', 'Customer AG')->get();
-        $types = Dropdown::where('category', 'Type')->get();
-        $tax = Dropdown::where('category', 'Withholding Tax')->get();
-        $title = Dropdown::where('category', 'Title')->get();
-        $response = Http::get('https://restcountries.com/v3.1/all');
-        $countries = $response->json();
-        $data = CustomerMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
+    // Sort the array alphabetically by currency name
+    usort($currencyArray, function($a, $b) {
+        return strcasecmp($a['name'], $b['name']);
+    });
 
-        // Sort countries alphabetically by name
-        usort($countries, function ($a, $b) {
-            return strcasecmp($a['name']['common'], $b['name']['common']);
-        });
+    // Fetch customer data with related logs
+    $data = CustomerMaster::with(['latestChange', 'latestChange.approvalLogs.approver'])->where('id', $id)->first();
 
-        // Fetch currencies from API
-        $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
-        $currencies = $currencyResponse->json();
+    // Convert the account_group string to an array
+    $data->account_group = explode(',', $data->account_group);
 
-        // Convert the currencies object to an array of [code, name] pairs
-        $currencyArray = [];
-        foreach ($currencies as $code => $name) {
-            $currencyArray[] = ['code' => $code, 'name' => $name];
-        }
+    return view('customer.update', compact('data', 'customerAG', 'tax', 'types', 'title', 'countries', 'currencyArray'));
+}
 
-        // Sort the array alphabetically by currency name
-        usort($currencyArray, function ($a, $b) {
-            return strcasecmp($a['name'], $b['name']);
-        });
+public function detail($id)
+{
+    $id = decrypt($id);
+    $customerAG = Dropdown::where('category', 'Customer AG')->get();
+    $types = Dropdown::where('category', 'Type')->get();
+    $tax = Dropdown::where('category', 'Withholding Tax')->get();
+    $title = Dropdown::where('category', 'Title')->get();
+    $response = Http::get('https://restcountries.com/v3.1/all');
+    $countries = $response->json();
+    $data = CustomerMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
 
-        // Convert the account_group string to an array
-        $data->account_group = explode(',', $data->account_group);
+    // Sort countries alphabetically by name
+    usort($countries, function($a, $b) {
+        return strcasecmp($a['name']['common'], $b['name']['common']);
+    });
 
-        return view('customer.detail', compact('data', 'customerAG', 'tax', 'types', 'title', 'countries', 'currencyArray'));
+    // Fetch currencies from API
+    $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
+    $currencies = $currencyResponse->json();
+
+    // Convert the currencies object to an array of [code, name] pairs
+    $currencyArray = [];
+    foreach ($currencies as $code => $name) {
+        $currencyArray[] = ['code' => $code, 'name' => $name];
     }
+
+    // Sort the array alphabetically by currency name
+    usort($currencyArray, function($a, $b) {
+        return strcasecmp($a['name'], $b['name']);
+    });
+
+    // Convert the account_group string to an array
+    $data->account_group = explode(',', $data->account_group);
+
+    return view('customer.detail', compact('data', 'customerAG', 'tax', 'types', 'title', 'countries', 'currencyArray'));
+}
+
 
     public function storeUpdate(Request $request)
     {

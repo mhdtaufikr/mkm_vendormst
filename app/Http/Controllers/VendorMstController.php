@@ -24,14 +24,16 @@ use Illuminate\Support\Facades\Log;
 class VendorMstController extends Controller
 {
     public function index() {
-        // Fetch all vendor masters with their current status
+        // Fetch all vendor masters with their current status and approval logs
         $item = VendorMaster::with(['vendorChanges.logs.approver'])->get();
+
         $dropdown = Dropdown::where('category', 'Form')
                     ->orderBy('name_value', 'asc')
                     ->get();
 
         return view('vendor.list', compact('item', 'dropdown'));
     }
+
     public function form() {
         $vendorAG = Dropdown::where('category', 'Vendor AG')->get();
         $types = Dropdown::where('category', 'Type')->get();
