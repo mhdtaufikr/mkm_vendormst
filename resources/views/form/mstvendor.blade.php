@@ -408,10 +408,7 @@
                                         <div class="mb-3">
                                             <label for="fileInput">Upload Files</label>
                                             <input id="fileInput" type="file" class="form-control">
-                                            <small class="text-muted">You can select files from different folders. Click "Add File" to select another file from a different folder.</small>
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-secondary" id="addFileButton">Add File</button>
-                                            </div>
+
                                             <!-- Basket of selected files -->
                                             <ul class="list-group mt-3" id="fileBasket"></ul>
                                         </div>
