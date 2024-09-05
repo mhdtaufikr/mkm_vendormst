@@ -419,11 +419,7 @@
                                         <!-- Hidden input to store files for form submission -->
                                         <input type="hidden" name="files[]" id="hiddenFiles">
 
-                                        <!-- Form submission buttons -->
-                                        <div class="d-flex justify-content-between mt-3">
-                                            <button type="button" class="btn btn-secondary prev-btn">Previous</button>
-                                            <button type="submit" class="btn btn-primary">Submit</button>
-                                        </div>
+
                                                         <div class="d-flex justify-content-center">
                                                             <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                                         </div>
