@@ -18,7 +18,7 @@
                 Master Vendor
                 </a>
 
-                @if(\Auth::user()->role === 'IT')
+                @if(\Auth::user()->role === 'Super Admin')
                 <!-- Sidenav Menu Heading (Core)-->
                 <div class="sidenav-menu-heading">Configuration</div>
                 <!-- Sidenav Accordion (Utilities)-->
