@@ -19,7 +19,10 @@ use App\Mail\VendorRemandMail;
 use App\Mail\VendorFormCompleted;
 use Carbon\Carbon;
 use PDF;
+use App\Exports\VendorTemplateExport;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\VendorImport;
 
 class VendorMstController extends Controller
 {
@@ -672,4 +675,20 @@ public function approval(Request $request)
             }
         }
 
+
+        public function excelFormat()
+        {
+            return Excel::download(new VendorTemplateExport, 'vendor_template.xlsx');
+        }
+
+        public function excelUpload(Request $request)
+    {
+        // Import data from the uploaded file
+        try {
+            Excel::import(new VendorImport, $request->file('excel-file'));
+            return back()->with('success', 'Vendor data imported successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'There was an error importing the data: ' . $e->getMessage());
+        }
+    }
 }

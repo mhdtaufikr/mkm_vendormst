@@ -41,6 +41,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/vendor/update/store', [VendorMstController::class, 'storeUpdate']);
     Route::get('/vendor/checked/{id}', [VendorMstController::class, 'checked']);
     Route::post('/vendor/approval', [VendorMstController::class, 'approval']);
+    Route::get('/vendor/template', [VendorMstController::class, 'excelFormat']);
+    Route::post('/vendor/upload', [VendorMstController::class, 'excelUpload']);
 
 
     //Customer Master
