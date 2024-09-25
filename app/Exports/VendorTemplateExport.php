@@ -17,7 +17,7 @@ class VendorTemplateExport implements WithHeadings, WithEvents
             'House Number', 'Postal Code', 'City', 'Country', 'Region',
             'PO Box', 'Telephone', 'Fax', 'Email', 'Tax Code',
             'NPWP', 'Currency', 'Bank Key', 'Bank Account', 'Account Holder',
-            'Bank Region', 'Date',
+            'Bank Region', 'Confirm With', 'Confirm Info', 'Date', 'Confirm By',
             'Recon Account', 'Sort Key', 'Cash Management Group', 'Payment Terms',
             'Payment Method', 'Payment Block', 'Withholding Tax', // AK column
 

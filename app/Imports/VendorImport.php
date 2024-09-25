@@ -45,17 +45,37 @@ class VendorImport implements ToModel, WithHeadingRow
         "18" => "W/H Tax 4 (4%) Jasa Konstruksi tidak memiliki KLU;"
     ];
 
+    // Helper function to validate and convert input data to string if it's an integer or float
+    private function validateAndConvertToString($data): string
+    {
+        // If the input is a float, convert it to a string with comma-separated values
+        if (is_float($data)) {
+            return str_replace('.', ',', strval($data));
+        }
+
+        // Convert any type of input to string to ensure consistent handling
+        return strval($data);
+    }
+
     public function model(array $row)
     {
-        // Convert account_group numbers to descriptions
-        $accountGroups = explode(',', $row['account_group']);
-        $accountGroupDescriptions = array_map(function ($group) {
-            return $this->accountGroupDescriptions[$group] ?? $group;
-        }, $accountGroups);
-        $accountGroupString = implode(', ', $accountGroupDescriptions);
+        // Validate and convert input data to string if necessary
+        $accountGroupData = $this->validateAndConvertToString($row['account_group']);
+        $withholdingTaxData = $this->validateAndConvertToString($row['withholding_tax']);
 
-        // Convert withholding_tax number to description
-        $withholdingTaxDescription = $this->withholdingTaxDescriptions[$row['withholding_tax']] ?? $row['withholding_tax'];
+        // Convert account_group numbers to descriptions and join with "|"
+        $accountGroups = explode(',', $accountGroupData);
+        $accountGroupDescriptions = array_map(function ($group) {
+            return $this->accountGroupDescriptions[trim($group)] ?? trim($group);
+        }, $accountGroups);
+        $accountGroupString = implode(',', $accountGroupDescriptions);
+
+        // Convert withholding_tax numbers to descriptions and join with "|"
+        $withholdingTaxGroups = explode(',', $withholdingTaxData);
+        $withholdingTaxDescriptions = array_map(function ($tax) {
+            return $this->withholdingTaxDescriptions[trim($tax)] ?? trim($tax);
+        }, $withholdingTaxGroups);
+        $withholdingTaxString = implode('|', $withholdingTaxDescriptions);
 
         DB::beginTransaction();
         try {
@@ -63,7 +83,7 @@ class VendorImport implements ToModel, WithHeadingRow
             $vendor = VendorMaster::create([
                 'vendor_account_number' => $row['vendor_account_number'],
                 'company_code' => $row['company_code'],
-                'account_group' => $accountGroupString, // Converted descriptions
+                'account_group' => $accountGroupString, // Converted descriptions with "|"
                 'vendor_name' => $row['vendor_name'],
                 'title' => $row['title'],
                 'department' => $row['department'],
@@ -97,7 +117,7 @@ class VendorImport implements ToModel, WithHeadingRow
                 'payment_terms' => $row['payment_terms'],
                 'payment_method' => $row['payment_method'],
                 'payment_block' => $row['payment_block'],
-                'withholding_tax' => $withholdingTaxDescription, // Converted description
+                'withholding_tax' => $withholdingTaxString, // Converted descriptions with "|"
                 'remarks' => $row['remarks'],
             ]);
 
@@ -109,7 +129,7 @@ class VendorImport implements ToModel, WithHeadingRow
                 'remarks' => $row['remarks'], // Use remarks from the row
                 'status' => 'Completed', // Default value
                 'level' => 8, // Default value
-                'created_by' => null, // Default value
+                'created_by' => 1, // Default value
                 'approved_by' => null, // Default value
                 'approved_at' => null, // Default value
                 'created_at' => now(), // Use current timestamp

@@ -688,7 +688,7 @@ public function approval(Request $request)
             Excel::import(new VendorImport, $request->file('excel-file'));
             return back()->with('success', 'Vendor data imported successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'There was an error importing the data: ' . $e->getMessage());
+            return back()->with('failed', 'There was an error importing the data: ' . $e->getMessage());
         }
     }
 }
