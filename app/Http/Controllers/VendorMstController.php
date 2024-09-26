@@ -208,6 +208,21 @@ public function update($id){
     $response = Http::get('https://restcountries.com/v3.1/all');
     $countries = $response->json();
     $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
+    // Find the vendor master record
+    $vendorMaster = VendorMaster::findOrFail($id);
+
+    // Check if there is an associated vendor change record
+    $vendorChange = VendorChange::where('vendor_id', $vendorMaster->id)->first();
+
+    // If no vendor change record found, redirect back with an error
+    if (!$vendorChange) {
+        return redirect()->back()->with('failed', 'No associated vendor change record found.');
+    }
+
+    // Check if the level is 8
+    if ($vendorChange->level != 8) {
+        return redirect()->back()->with('failed', 'Data is still under approval and cannot be updated.');
+    }
 
 
     // Sort countries alphabetically by name
@@ -338,6 +353,14 @@ public function storeUpdate(Request $request)
     unset($validatedData['payment_block']);
     unset($validatedData['email_no_handphone']);
 
+    // Find the existing vendor change record
+    $vendorChange = VendorChange::where('vendor_id', $validatedData['id'])->firstOrFail();
+
+    // Check if the level is 8, if not redirect back with a message
+    if ($vendorChange->level != 8) {
+        return redirect()->back()->with('error', 'The data is still under approval and cannot be updated at this moment.');
+    }
+
     // Find the existing vendor record
     $vendorMaster = VendorMaster::findOrFail($validatedData['id']);
 
@@ -369,15 +392,14 @@ public function storeUpdate(Request $request)
         'confirm_info' => $confirmInfo,
     ]));
 
-    // Update the existing vendor change record
-    $vendorChange = VendorChange::where('vendor_id', $vendorMaster->id)->firstOrFail();
+    // Update the vendor change record with status 'Pending' and level 1
     $vendorChange->update([
         'change_type' => $validatedData['change_type'],
         'previous_sap_vendor_number' => $validatedData['previous_sap_vendornumber'],
         'remarks' => $validatedData['Remarks'] ?? '',
         'status' => 'Pending', // Set initial status as pending
         'created_by' => Auth::id(), // Assuming you have authentication and get the current user's ID
-        'level' => 1,
+        'level' => 1, // Update level to 1 after processing
     ]);
 
     // Create a new approval log entry in approval_log_vendor table
@@ -412,8 +434,9 @@ public function storeUpdate(Request $request)
     }
 
     // Redirect or return a response as needed
-    return redirect('/mst/vendor')->with('status', 'Vendor updated successfully');
+    return redirect('/mst/vendor')->with('status', 'Vendor updated successfully and approval process started.');
 }
+
 
 
 

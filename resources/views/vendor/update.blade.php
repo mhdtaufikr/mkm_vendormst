@@ -486,14 +486,12 @@
                                                                <br>
                                                                <label for="file" class="form-label">Upload File</label>
                                                         <input name="file" type="file" class="form-control">
+                                                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="d-flex justify-content-center">
-                                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
-                                        </div>
 
                                     </form>
                                 </div>
