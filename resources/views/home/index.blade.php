@@ -59,7 +59,7 @@
                                     @foreach($pendingList as $index => $item)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $item->vendor->vendor_name }}</td>
+                                            <td>{{ $item->vendor ? $item->vendor->vendor_name : 'No Vendor Name' }}</td>
                                             <td>{{ $item->change_type }}</td>
                                             <td>
                                                 <a href="{{ url('/vendor/checked/' .encrypt($item->id) ) }}" class="btn btn-primary btn-sm">
