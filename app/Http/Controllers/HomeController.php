@@ -13,9 +13,9 @@ class HomeController extends Controller
     // Get the current logged-in user's level
     $userLevel = auth()->user()->level;
     // Fetch vendor changes that match the user's level
-    $pendingList = VendorChange::where('level', $userLevel)
+    $pendingList = VendorChange::with(['vendor', 'logs.approver'])
+                                ->where('level', auth()->user()->level) // assuming you are fetching pending based on user level
                                 ->get();
-
     return view('home.index', compact('pendingList'));
 }
 
