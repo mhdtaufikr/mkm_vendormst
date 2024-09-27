@@ -197,17 +197,26 @@
                                                 {{ $change->latestPending == 'Approved' ? 'Approved' : 'Pending at ' . $change->latestPending }}
                                             </strong>
 
-
                                             <button class="btn btn-link btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#approvalRoute{{ $change->id }}" aria-expanded="false" aria-controls="approvalRoute{{ $change->id }}">
                                                 Show All
                                             </button>
                                             <div class="collapse" id="approvalRoute{{ $change->id }}">
                                                 <ul class="list-unstyled">
-                                                    @foreach ($change->approvalRoutes->unique('level') as $route)
+                                                    @php
+                                                        // Group approval routes by dept and level for internal use
+                                                        $groupedRoutes = $change->approvalRoutes->groupBy(function($route) {
+                                                            return $route->dept . ' (Level ' . $route->level . ')';
+                                                        });
+                                                    @endphp
+                                                    @foreach ($groupedRoutes as $groupKey => $routes)
+                                                        @php
+                                                            // Extract the department name only, ignoring the level in the display
+                                                            $displayDept = explode(' (Level', $groupKey)[0];
+                                                        @endphp
                                                         <li>
-                                                            <strong>{{ $route->dept }} :</strong>
-                                                            {{ $route->name }} -
-                                                            <span>
+                                                            <strong>{{ $displayDept }}:</strong>
+                                                            @foreach ($routes as $route)
+                                                                {{ $route->name }} -
                                                                 @if ($route->status == 'Approved')
                                                                     <span class="text-success">(Approved)</span>
                                                                 @elseif ($route->status == 'Pending')
@@ -215,7 +224,10 @@
                                                                 @else
                                                                     <span class="text-secondary">(Not yet reviewed)</span>
                                                                 @endif
-                                                            </span>
+                                                                @if (!$loop->last)
+                                                                    , <!-- Add a comma separator between approvers -->
+                                                                @endif
+                                                            @endforeach
                                                         </li>
                                                     @endforeach
                                                 </ul>
@@ -223,6 +235,9 @@
                                         </div>
                                     @endforeach
                                 </td>
+
+
+
 
                                 <td>
                                     <div class="btn-group">

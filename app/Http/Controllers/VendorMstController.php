@@ -26,7 +26,8 @@ use App\Imports\VendorImport;
 
 class VendorMstController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         // Fetch all vendor masters with their changes and related approvals
         $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])->get();
 
@@ -54,10 +55,18 @@ class VendorMstController extends Controller
 
                 // Add status to each distinct route in the filtered approval routes
                 foreach ($filteredRoutes as $route) {
+                    // Find logs for this approver and level
+                    $approvalLog = $change->logs->firstWhere('approver.name', $route->name);
+
                     if ($route->level < $currentLevel) {
                         $route->status = 'Approved';
                     } elseif ($route->level == $currentLevel) {
-                        $route->status = 'Pending'; // or 'Circulating'
+                        // If the approval log exists and the action is "Approved", set status as approved
+                        if ($approvalLog && $approvalLog->approval_action === 'Approved') {
+                            $route->status = 'Approved';
+                        } else {
+                            $route->status = 'Pending'; // If not approved, show as Pending
+                        }
                     } else {
                         $route->status = 'Not yet reviewed';
                     }
@@ -68,10 +77,11 @@ class VendorMstController extends Controller
                     return clone $route; // Clone the route to avoid reference issues
                 });
 
-                // Find the latest pending approver or set as "Approved" if none are pending
-                $latestPendingRoute = $filteredRoutes->firstWhere('status', 'Pending');
-                if ($latestPendingRoute) {
-                    $change->latestPending = $latestPendingRoute->name;
+                // Determine all pending approvers for the current level
+                $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
+                if (!empty($pendingApprovers)) {
+                    // Concatenate all pending names with " & " separator
+                    $change->latestPending = implode(' & ', $pendingApprovers);
                 } else {
                     $change->latestPending = 'Approved';
                 }
@@ -85,6 +95,8 @@ class VendorMstController extends Controller
 
         return view('vendor.list', compact('items', 'dropdown'));
     }
+
+
 
 
 
