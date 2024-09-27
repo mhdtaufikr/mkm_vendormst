@@ -37,6 +37,42 @@
     <section class="content">
         <div class="container-fluid">
             <div class="container-xl px-4 mt-n10">
+                <!-- Pending List Section -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>Pending List for Approval</h3>
+                    </div>
+                    <div class="card-body">
+                        @if($pendingList->isEmpty())
+                            <p>No pending approvals at this moment.</p>
+                        @else
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Vendor Name</th>
+                                        <th>Change Type</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($pendingList as $index => $item)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $item->vendor->vendor_name }}</td>
+                                            <td>{{ $item->change_type }}</td>
+                                            <td>
+                                                <a href="{{ url('/vendor/checked/' .encrypt($item->id) ) }}" class="btn btn-primary btn-sm">
+                                                    Approve
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
         <!-- /.container-fluid -->
@@ -56,8 +92,6 @@
 
         document.getElementById('lblGreetings').innerHTML =
             '<b>' + greet + '</b> and welcome to MKM Vendor Account Request';
-
-
     </script>
 </main>
 @endsection

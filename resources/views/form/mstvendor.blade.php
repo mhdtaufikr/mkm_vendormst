@@ -391,15 +391,53 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label">Withholding Tax</label>
+                                                        <!-- Select All Checkbox -->
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="selectAllTaxes">
+                                                            <label class="form-check-label" for="selectAllTaxes">
+                                                                Select All
+                                                            </label>
+                                                        </div>
                                                         @foreach($tax as $option)
                                                             <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" name="withholding_tax[]" id="{{ $option->code_format }}" value="{{ $option->name_value }}">
+                                                                <input class="form-check-input tax-checkbox" type="checkbox" name="withholding_tax[]" id="{{ $option->code_format }}" value="{{ $option->name_value }}">
                                                                 <label class="form-check-label" for="{{ $option->code_format }}">
                                                                     {{ $option->name_value }}
                                                                 </label>
                                                             </div>
                                                         @endforeach
                                                     </div>
+
+                                                    <!-- Include this script to handle the Select All functionality -->
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const selectAllCheckbox = document.getElementById('selectAllTaxes');
+                                                            const taxCheckboxes = document.querySelectorAll('.tax-checkbox');
+
+                                                            // Event listener for the Select All checkbox
+                                                            selectAllCheckbox.addEventListener('change', function() {
+                                                                const isChecked = this.checked;
+                                                                taxCheckboxes.forEach(function(checkbox) {
+                                                                    checkbox.checked = isChecked;
+                                                                });
+                                                            });
+
+                                                            // Event listener for individual checkboxes
+                                                            taxCheckboxes.forEach(function(checkbox) {
+                                                                checkbox.addEventListener('change', function() {
+                                                                    if (!this.checked) {
+                                                                        selectAllCheckbox.checked = false;
+                                                                    } else {
+                                                                        const allChecked = Array.from(taxCheckboxes).every(function(cb) {
+                                                                            return cb.checked;
+                                                                        });
+                                                                        selectAllCheckbox.checked = allChecked;
+                                                                    }
+                                                                });
+                                                            });
+                                                        });
+                                                    </script>
+
                                                     <div class="col-md-6 mb-3">
                                                         <label for="payment_block" class="form-label">Payment Block</label>
                                                         <input type="checkbox" class="form-check-input mb-3" id="payment_block" name="payment_block">

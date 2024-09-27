@@ -4,14 +4,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CustomerMaster;
 use App\Models\Dropdown;
+use App\Models\VendorChange;
 
 class HomeController extends Controller
 {
     public function index()
-    {
-        return view('home.index');
+{
+    // Get the current logged-in user's level
+    $userLevel = auth()->user()->level;
+    // Fetch vendor changes that match the user's level
+    $pendingList = VendorChange::where('level', $userLevel)
+                                ->get();
 
-    }
+    return view('home.index', compact('pendingList'));
+}
+
 
 
 

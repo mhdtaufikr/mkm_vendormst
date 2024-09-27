@@ -27,15 +27,66 @@ use App\Imports\VendorImport;
 class VendorMstController extends Controller
 {
     public function index() {
-        // Fetch all vendor masters with their current status and approval logs
-        $item = VendorMaster::with(['vendorChanges.logs.approver'])->get();
+        // Fetch all vendor masters with their changes and related approvals
+        $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])->get();
 
+        // Fetch all users to map id to name
+        $users = User::select('id', 'username')->get()->pluck('username', 'id');
+
+        // Fetch distinct approval routes based on level
+        $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
+            ->orderBy('level', 'asc')
+            ->get();
+
+        // Determine approval status for each vendor change
+        foreach ($items as $item) {
+            foreach ($item->vendorChanges as $change) {
+                // Get the name of the creator using the created_by id from the vendor changes
+                $createdByName = $users->get($change->created_by);
+
+                // Filter approval routes based on the mapped name from the users table
+                $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName) {
+                    // If 'requester' matches 'created_by' name or 'requester' is null (default route)
+                    return $route->requester === $createdByName || is_null($route->requester);
+                });
+
+                $currentLevel = $change->level; // The current level of the vendor change process
+
+                // Add status to each distinct route in the filtered approval routes
+                foreach ($filteredRoutes as $route) {
+                    if ($route->level < $currentLevel) {
+                        $route->status = 'Approved';
+                    } elseif ($route->level == $currentLevel) {
+                        $route->status = 'Pending'; // or 'Circulating'
+                    } else {
+                        $route->status = 'Not yet reviewed';
+                    }
+                }
+
+                // Attach the filtered approval routes to the change for display in the view
+                $change->approvalRoutes = $filteredRoutes->map(function ($route) {
+                    return clone $route; // Clone the route to avoid reference issues
+                });
+
+                // Find the latest pending approver or set as "Approved" if none are pending
+                $latestPendingRoute = $filteredRoutes->firstWhere('status', 'Pending');
+                if ($latestPendingRoute) {
+                    $change->latestPending = $latestPendingRoute->name;
+                } else {
+                    $change->latestPending = 'Approved';
+                }
+            }
+        }
+
+        // Fetch dropdown data for form filtering or selection
         $dropdown = Dropdown::where('category', 'Form')
-                    ->orderBy('name_value', 'asc')
-                    ->get();
+            ->orderBy('name_value', 'asc')
+            ->get();
 
-        return view('vendor.list', compact('item', 'dropdown'));
+        return view('vendor.list', compact('items', 'dropdown'));
     }
+
+
 
     public function form() {
         $vendorAG = Dropdown::where('category', 'Vendor AG')->get();
