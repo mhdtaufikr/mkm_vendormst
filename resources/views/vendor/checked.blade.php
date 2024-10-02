@@ -432,16 +432,55 @@
 
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h3 class="card-title">Uploaded PDF File</h3>
+                                    <h3 class="card-title">Uploaded Files</h3>
                                 </div>
                                 <div class="card-body">
-                                    @if($data->file)
-                                        <iframe src="{{ asset($data->file) }}" style="width:100%; height:600px;" frameborder="0"></iframe>
+                                    @if($data->files && is_array($data->files) && count($data->files) > 0)
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 10%">Icon</th>
+                                                    <th style="width: 70%">File Name</th>
+                                                    <th style="width: 20%">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($data->files as $file)
+                                                    @php
+                                                        $fileExtension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                                                    @endphp
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            @if(in_array($fileExtension, ['xls', 'xlsx']))
+                                                                <i class="fas fa-file-excel fa-2x text-success"></i> <!-- Excel Icon -->
+                                                            @elseif(in_array($fileExtension, ['pdf']))
+                                                                <i class="fas fa-file-pdf fa-2x text-danger"></i> <!-- PDF Icon -->
+                                                            @elseif(in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                                <i class="fas fa-file-image fa-2x text-primary"></i> <!-- Image Icon -->
+                                                            @elseif(in_array($fileExtension, ['doc', 'docx']))
+                                                                <i class="fas fa-file-word fa-2x text-info"></i> <!-- Word Icon -->
+                                                            @else
+                                                                <i class="fas fa-file-alt fa-2x text-secondary"></i> <!-- Default File Icon -->
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ basename($file) }}</td>
+                                                        <td>
+                                                            <a href="{{ asset($file) }}" class="btn btn-primary btn-sm" download>
+                                                                Download
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     @else
-                                        <p>No PDF file uploaded.</p>
+                                        <p>No files uploaded.</p>
                                     @endif
                                 </div>
                             </div>
+
+
+
 
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">

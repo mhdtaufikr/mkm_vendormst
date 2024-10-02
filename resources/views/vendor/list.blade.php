@@ -219,6 +219,9 @@
                                                                 {{ $route->name }} -
                                                                 @if ($route->status == 'Approved')
                                                                     <span class="text-success">(Approved)</span>
+                                                                    @if ($route->timestamp)
+                                                                    <span class="text-muted">{{ date('d/m/Y, H:i', strtotime($route->timestamp)) }}</span>
+                                                                    @endif
                                                                 @elseif ($route->status == 'Pending')
                                                                     <span class="text-warning">(Pending)</span>
                                                                 @else
@@ -235,6 +238,7 @@
                                         </div>
                                     @endforeach
                                 </td>
+
 
 
 

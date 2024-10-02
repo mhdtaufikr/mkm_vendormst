@@ -27,74 +27,78 @@ use App\Imports\VendorImport;
 class VendorMstController extends Controller
 {
     public function index()
-    {
-        // Fetch all vendor masters with their changes and related approvals
-        $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])->get();
+{
+    // Fetch all vendor masters with their changes and related approvals, including logs and timestamps
+    $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])->get();
 
-        // Fetch all users to map id to name
-        $users = User::select('id', 'username')->get()->pluck('username', 'id');
+    // Fetch all users to map id to name
+    $users = User::select('id', 'username')->get()->pluck('username', 'id');
 
-        // Fetch distinct approval routes based on level
-        $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
-            ->orderBy('level', 'asc')
-            ->get();
+    // Fetch distinct approval routes based on level
+    $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
+        ->orderBy('level', 'asc')
+        ->get();
 
-        // Determine approval status for each vendor change
-        foreach ($items as $item) {
-            foreach ($item->vendorChanges as $change) {
-                // Get the name of the creator using the created_by id from the vendor changes
-                $createdByName = $users->get($change->created_by);
+    // Determine approval status for each vendor change
+    foreach ($items as $item) {
+        foreach ($item->vendorChanges as $change) {
+            // Get the name of the creator using the created_by id from the vendor changes
+            $createdByName = $users->get($change->created_by);
 
-                // Filter approval routes based on the mapped name from the users table
-                $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName) {
-                    // If 'requester' matches 'created_by' name or 'requester' is null (default route)
-                    return $route->requester === $createdByName || is_null($route->requester);
-                });
+            // Filter approval routes based on the mapped name from the users table
+            $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName) {
+                // If 'requester' matches 'created_by' name or 'requester' is null (default route)
+                return $route->requester === $createdByName || is_null($route->requester);
+            });
 
-                $currentLevel = $change->level; // The current level of the vendor change process
+            $currentLevel = $change->level; // The current level of the vendor change process
 
-                // Add status to each distinct route in the filtered approval routes
-                foreach ($filteredRoutes as $route) {
-                    // Find logs for this approver and level
-                    $approvalLog = $change->logs->firstWhere('approver.name', $route->name);
+            // Add status and timestamp to each distinct route in the filtered approval routes
+            foreach ($filteredRoutes as $route) {
+                // Find logs for this approver and level
+                $approvalLog = $change->logs->firstWhere('approver.name', $route->name);
 
-                    if ($route->level < $currentLevel) {
+                if ($route->level < $currentLevel) {
+                    $route->status = 'Approved';
+                    $route->timestamp = $approvalLog ? $approvalLog->approval_timestamp : null;
+                } elseif ($route->level == $currentLevel) {
+                    // If the approval log exists and the action is "Approved", set status as approved
+                    if ($approvalLog && $approvalLog->approval_action === 'Approved') {
                         $route->status = 'Approved';
-                    } elseif ($route->level == $currentLevel) {
-                        // If the approval log exists and the action is "Approved", set status as approved
-                        if ($approvalLog && $approvalLog->approval_action === 'Approved') {
-                            $route->status = 'Approved';
-                        } else {
-                            $route->status = 'Pending'; // If not approved, show as Pending
-                        }
+                        $route->timestamp = $approvalLog->approval_timestamp;
                     } else {
-                        $route->status = 'Not yet reviewed';
+                        $route->status = 'Pending'; // If not approved, show as Pending
+                        $route->timestamp = null; // No timestamp for pending actions
                     }
-                }
-
-                // Attach the filtered approval routes to the change for display in the view
-                $change->approvalRoutes = $filteredRoutes->map(function ($route) {
-                    return clone $route; // Clone the route to avoid reference issues
-                });
-
-                // Determine all pending approvers for the current level
-                $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
-                if (!empty($pendingApprovers)) {
-                    // Concatenate all pending names with " & " separator
-                    $change->latestPending = implode(' & ', $pendingApprovers);
                 } else {
-                    $change->latestPending = 'Approved';
+                    $route->status = 'Not yet reviewed';
+                    $route->timestamp = null; // No timestamp for not reviewed actions
                 }
             }
+
+            // Attach the filtered approval routes to the change for display in the view
+            $change->approvalRoutes = $filteredRoutes->map(function ($route) {
+                return clone $route; // Clone the route to avoid reference issues
+            });
+
+            // Determine all pending approvers for the current level
+            $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
+            if (!empty($pendingApprovers)) {
+                // Concatenate all pending names with " & " separator
+                $change->latestPending = implode(' & ', $pendingApprovers);
+            } else {
+                $change->latestPending = 'Approved';
+            }
         }
-
-        // Fetch dropdown data for form filtering or selection
-        $dropdown = Dropdown::where('category', 'Form')
-            ->orderBy('name_value', 'asc')
-            ->get();
-
-        return view('vendor.list', compact('items', 'dropdown'));
     }
+
+    // Fetch dropdown data for form filtering or selection
+    $dropdown = Dropdown::where('category', 'Form')
+        ->orderBy('name_value', 'asc')
+        ->get();
+
+    return view('vendor.list', compact('items', 'dropdown'));
+}
 
 
 
@@ -133,7 +137,10 @@ class VendorMstController extends Controller
 
     public function store(Request $request)
     {
-        // Validate the incoming request data
+        // Debugging request input (you can remove this once it's working)
+        // dd($request->all());
+
+        // Validate the incoming request data, including multiple file types for the files
         $validatedData = $request->validate([
             'company_code' => 'required|string|max:255',
             'account_group' => 'nullable|array',
@@ -175,19 +182,11 @@ class VendorMstController extends Controller
             'payment_terms' => 'nullable|string|max:255',
             'payment_method' => 'nullable|string|max:255',
             'sort_key' => 'nullable|string|max:255',
+
+            // Allow multiple file types (pdf, doc, docx, xlsx, images, etc.)
+            'files' => 'nullable|array', // Allow multiple files as an array
+            'files.*' => 'nullable|file|mimes:pdf,doc,docx,xlsx,jpg,jpeg,png,gif,bmp|max:2048', // Validate each file with multiple formats
         ]);
-
-        // Handle file upload if exists
-        if ($request->hasFile('file')) {
-            // Move the uploaded file to public/assets/upload directory
-            $file = $request->file('file');
-            $fileName = uniqid() . '_' . $file->getClientOriginalName();
-            $destinationPath = public_path('assets/upload');
-            $file->move($destinationPath, $fileName);
-
-            // Add file path to validated data for database storage
-            $validatedData['file'] = 'assets/upload/' . $fileName;
-        }
 
         // Extract and prepare account_group and withholding_tax for saving as pipe-separated strings
         $accountGroup = isset($validatedData['account_group']) ? implode(',', $validatedData['account_group']) : null;
@@ -195,6 +194,22 @@ class VendorMstController extends Controller
 
         // Handle the payment_block checkbox
         $paymentBlock = isset($validatedData['payment_block']) ? 1 : 0;
+
+        // Handle multiple file uploads if exists
+        $filePaths = [];
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                // Generate a unique file name and move the file to the public directory
+                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                $destinationPath = public_path('assets/upload');
+                $file->move($destinationPath, $fileName);
+
+                // Add the file path to the array
+                $filePaths[] = 'assets/upload/' . $fileName;
+            }
+            // Store the file paths as a JSON string
+            $validatedData['file'] = json_encode($filePaths);
+        }
 
         // Create a new vendor record in vendor_masters table
         $vendorMaster = VendorMaster::create(array_merge($validatedData, [
@@ -257,6 +272,7 @@ class VendorMstController extends Controller
         // Redirect or return a response as needed
         return redirect('/mst/vendor')->with('status', 'success input master vendor');
     }
+
 
 
 
@@ -543,8 +559,12 @@ public function checked($id)
     // Get the current user's level
     $currentUserLevel = Auth::user()->level;
 
+    // Parse the JSON file field (if exists)
+    $data->files = json_decode($data->file, true); // This will be an array of files
+
     return view('vendor.checked', compact('data', 'vendorAG', 'tax', 'types', 'title', 'countries', 'currencyArray', 'latestLevel', 'currentUserLevel'));
 }
+
 
 
 public function approval(Request $request)
