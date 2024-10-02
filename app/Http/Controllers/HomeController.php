@@ -11,30 +11,43 @@ class HomeController extends Controller
 {
     public function index()
 {
-    // Step 1: Fetch vendor changes that match the current user's level
-    $pendingList = VendorChange::with(['vendor', 'logs.approver'])
-        ->where('level', auth()->user()->level)
-        ->get();
+    // Get the current user's level and department
+    $userLevel = auth()->user()->level;
+    $userDept = auth()->user()->dept;
 
-    // Step 2: Fetch the requesters (usernames) from ApprovalRoute where the current user is an approver
-    $approvalRouteRequesters = ApprovalRoute::where('name', auth()->user()->username)
-        ->pluck('requester');
-
-    // Step 3: Filter pendingList where created_by matches the id of users whose usernames are in approvalRouteRequesters
+    // Step 1: Start the base query for vendor changes matching the user's level
     $pendingList = VendorChange::with(['vendor', 'logs.approver'])
-        ->where('level', auth()->user()->level)
-        ->whereHas('vendor', function ($query) use ($approvalRouteRequesters) {
+        ->where('level', $userLevel);
+
+    // Step 2: Add additional filtering based on the user's level
+    if ($userLevel == 1) {
+        // Fetch the requesters (usernames) from ApprovalRoute where the current user is an approver
+        $approvalRouteRequesters = ApprovalRoute::where('name', auth()->user()->username)
+            ->pluck('requester');
+
+        // Apply the filter based on requesters
+        $pendingList->whereHas('vendor', function ($query) use ($approvalRouteRequesters) {
             $query->whereIn('created_by', function ($query) use ($approvalRouteRequesters) {
                 $query->select('id')
-                      ->from('users')
-                      ->whereIn('username', $approvalRouteRequesters);
+                    ->from('users')
+                    ->whereIn('username', $approvalRouteRequesters);
             });
-        })
-        ->get();
+        });
+    } elseif ($userLevel == 2) {
+        // Step 3: For level 2, filter by department
+        $pendingList->whereHas('vendor', function ($query) use ($userDept) {
+            $query->where('department', $userDept);
+        });
+    }
+    // No additional filters for level 3 and above; only filtering by level
+
+    // Get the filtered result
+    $pendingList = $pendingList->get();
 
     // Return the filtered list to the view
     return view('home.index', compact('pendingList'));
 }
+
 
 
 
