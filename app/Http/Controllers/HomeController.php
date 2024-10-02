@@ -5,19 +5,37 @@ use Illuminate\Http\Request;
 use App\Models\CustomerMaster;
 use App\Models\Dropdown;
 use App\Models\VendorChange;
+use App\Models\ApprovalRoute;
 
 class HomeController extends Controller
 {
     public function index()
 {
-    // Get the current logged-in user's level
-    $userLevel = auth()->user()->level;
-    // Fetch vendor changes that match the user's level
+    // Step 1: Fetch vendor changes that match the current user's level
     $pendingList = VendorChange::with(['vendor', 'logs.approver'])
-                                ->where('level', auth()->user()->level) // assuming you are fetching pending based on user level
-                                ->get();
+        ->where('level', auth()->user()->level)
+        ->get();
+
+    // Step 2: Fetch the requesters (usernames) from ApprovalRoute where the current user is an approver
+    $approvalRouteRequesters = ApprovalRoute::where('name', auth()->user()->username)
+        ->pluck('requester');
+
+    // Step 3: Filter pendingList where created_by matches the id of users whose usernames are in approvalRouteRequesters
+    $pendingList = VendorChange::with(['vendor', 'logs.approver'])
+        ->where('level', auth()->user()->level)
+        ->whereHas('vendor', function ($query) use ($approvalRouteRequesters) {
+            $query->whereIn('created_by', function ($query) use ($approvalRouteRequesters) {
+                $query->select('id')
+                      ->from('users')
+                      ->whereIn('username', $approvalRouteRequesters);
+            });
+        })
+        ->get();
+
+    // Return the filtered list to the view
     return view('home.index', compact('pendingList'));
 }
+
 
 
 
