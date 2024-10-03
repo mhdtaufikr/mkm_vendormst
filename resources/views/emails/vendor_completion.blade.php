@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vendor Completion Notification</title>
+    <title>Supplier Completion Notification</title>
 </head>
 <body>
     <p>Dear Sir/Madam {{ $userName }},</p>
-    <p>The vendor form with account number {{ $vendorMaster->vendor_account_number }} has been completed.</p>
+    <p>The Supplier form with account number {{ $vendorMaster->vendor_account_number }} has been completed.</p>
 </body>
 </html>

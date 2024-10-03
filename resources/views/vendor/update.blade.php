@@ -23,7 +23,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Vendor Master Form</h3>
+                                    <h3 class="card-title">Supplier Master Form</h3>
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
@@ -113,7 +113,7 @@
 
                                     <form novalidate method="POST" action="{{ url('/vendor/update/store') }}" enctype="multipart/form-data">
                                         @csrf
-                                        <h3><strong>Vendor Master Request Form</strong></h3>
+                                        <h3><strong>Supplier Master Request Form</strong></h3>
                                         <div class="row">
                                             <!-- Your existing form fields go here -->
                                         </div>
@@ -128,19 +128,19 @@
                                                 <button style="color: black;" class="nav-link " id="reference-tab" data-bs-toggle="tab" data-bs-target="#reference" type="button" role="tab" aria-controls="reference" aria-selected="true">Reference</button>
                                             </li>
                                             <li class="nav-item" role="presentation">
-                                                <button style="color: black;" class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false">Vendor Address</button>
+                                                <button style="color: black;" class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false">Supplier Address</button>
                                             </li>
                                             <li class="nav-item" role="presentation">
-                                                <button style="color: black;" class="nav-link" id="control-tab" data-bs-toggle="tab" data-bs-target="#control" type="button" role="tab" aria-controls="control" aria-selected="false">Vendor Control</button>
+                                                <button style="color: black;" class="nav-link" id="control-tab" data-bs-toggle="tab" data-bs-target="#control" type="button" role="tab" aria-controls="control" aria-selected="false">Supplier Control</button>
                                             </li>
                                             <li class="nav-item" role="presentation">
-                                                <button style="color: black;" class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="false">Vendor Payment Control</button>
+                                                <button style="color: black;" class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="false">Supplier Payment Control</button>
                                             </li>
                                             <li class="nav-item" role="presentation">
-                                                <button style="color: black;" class="nav-link" id="accounting-tab" data-bs-toggle="tab" data-bs-target="#accounting" type="button" role="tab" aria-controls="accounting" aria-selected="false">Vendor Accounting Information</button>
+                                                <button style="color: black;" class="nav-link" id="accounting-tab" data-bs-toggle="tab" data-bs-target="#accounting" type="button" role="tab" aria-controls="accounting" aria-selected="false">Supplier Accounting Information</button>
                                             </li>
                                             <li class="nav-item" role="presentation">
-                                                <button style="color: black;" class="nav-link" id="transaction-tab" data-bs-toggle="tab" data-bs-target="#transaction" type="button" role="tab" aria-controls="transaction" aria-selected="false">Vendor Payment Transaction</button>
+                                                <button style="color: black;" class="nav-link" id="transaction-tab" data-bs-toggle="tab" data-bs-target="#transaction" type="button" role="tab" aria-controls="transaction" aria-selected="false">Supplier Payment Transaction</button>
                                             </li>
 
                                         </ul>
@@ -153,10 +153,10 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="col-md-12 mb-3">
-                                                                <label for="vendor_account_number" class="form-label">Vendor Account Number</label>
+                                                                <label for="vendor_account_number" class="form-label">Supplier Account Number</label>
                                                                 <input type="text" name="id" id="" value="{{$data->id}}" hidden>
                                                                 <input value="{{$data->vendor_account_number}}" type="text" class="form-control" id="vendor_account_number" name="vendor_account_number" >
-                                                                <small class="text-danger form-text">(Enter vendor account number only for vendor employee and vendor inter company)</small>
+                                                                <small class="text-danger form-text">(Enter Supplier account number only for Supplier employee and Supplier inter company)</small>
                                                             </div>
                                                             <label class="form-label">Account Group</label><br>
                                                             <div class="row">
@@ -198,11 +198,11 @@
 
                                                             <div class="col-md-12 mb-3">
                                                                 <div class="col-md-12 mb-3">
-                                                                    <label for="previous_sap_vendor_number" class="form-label">Previous SAP Vendor Number</label>
+                                                                    <label for="previous_sap_vendor_number" class="form-label">Previous SAP Supplier Number</label>
                                                                     <input value="{{$data->latestChange->previous_sap_vendor_number}}" type="text" class="form-control" id="previous_sap_vendor_number" name="previous_sap_vendornumber">
                                                                 </div>
 
-                                                               <small class="text-danger form-text">Note<span class="text-danger">*</span> : For Change, Block, Delete please enter the previous SAP Vendor number</small>
+                                                               <small class="text-danger form-text">Note<span class="text-danger">*</span> : For Change, Block, Delete please enter the previous SAP Supplier number</small>
 
                                                             </div>
                                                         </div>
@@ -219,7 +219,7 @@
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="vendor_name" class="form-label">Vendor Name</label>
+                                                        <label for="vendor_name" class="form-label">Supplier Name</label>
                                                         <input value="{{$data->vendor_name}}" type="text" class="form-control" id="vendor_name" name="vendor_name">
                                                     </div>
                                                 </div>

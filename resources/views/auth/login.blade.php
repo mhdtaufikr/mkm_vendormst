@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Vendor & Customer Master</title>
+    <title>Supplier & Customer Master</title>
     <link href="{{asset('assets/css/styles.css')}}" rel="stylesheet" />
     <link rel="icon" href="{{ asset('assets/img/mms.png') }}">
     <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
@@ -73,8 +73,8 @@
                                     <!--alert success -->
                                     <div class="text-center mb-4">
                                         <img class="img-fluid mb-4" src="{{ asset('assets/img/mms.png') }}" alt="" style="width: 50px; height: auto;">
-                                        <h1 class="text-center font-weight-bold" > <strong>Vendor & Customer Master</strong></h1>
-                                        <small  class="text-center mb-4">Digital Vendor & Customer Master</small>
+                                        <h1 class="text-center font-weight-bold" > <strong>Supplier & Customer Master</strong></h1>
+                                        <small  class="text-center mb-4">Digital Supplier & Customer Master</small>
                                     </div>
 
 

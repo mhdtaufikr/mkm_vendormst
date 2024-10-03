@@ -15,7 +15,7 @@
                 </a>
                 <a class="nav-link" href="{{url('/mst/vendor')}}">
                     <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
-                Master Vendor
+                Master Supplier
                 </a>
 
                 @if(\Auth::user()->role === 'Super Admin')

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vendor Master Maintenance Request Form</title>
+    <title>Supplier Master Maintenance Request Form</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,14 +36,14 @@
     </style>
 </head>
 <body>
-    <h1>Vendor Master Maintenance Request Form</h1>
+    <h1>Supplier Master Maintenance Request Form</h1>
 
-    <h3>Vendor Master Details</h3>
+    <h3>Supplier Master Details</h3>
     <table class="two-column-table">
         <tr>
             <th>ID</th>
             <td>{{ $vendorMaster->id }}</td>
-            <th>Vendor Account Number</th>
+            <th>Supplier Account Number</th>
             <td>{{ $vendorMaster->vendor_account_number }}</td>
         </tr>
         <tr>
@@ -53,7 +53,7 @@
             <td>{{ $vendorMaster->account_group }}</td>
         </tr>
         <tr>
-            <th>Vendor Name</th>
+            <th>Supplier Name</th>
             <td>{{ $vendorMaster->vendor_name }}</td>
             <th>Title</th>
             <td>{{ $vendorMaster->title }}</td>
@@ -150,18 +150,18 @@
 
     <div class="page-break"></div>
 
-    <h3>Vendor Change Details</h3>
+    <h3>Supplier Change Details</h3>
     <table class="two-column-table">
         <tr>
             <th>ID</th>
             <td>{{ $vendorChange->id }}</td>
-            <th>Vendor ID</th>
+            <th>Supplier ID</th>
             <td>{{ $vendorChange->vendor_id }}</td>
         </tr>
         <tr>
             <th>Change Type</th>
             <td>{{ $vendorChange->change_type }}</td>
-            <th>Previous SAP Vendor Number</th>
+            <th>Previous SAP Supplier Number</th>
             <td>{{ $vendorChange->previous_sap_vendor_number }}</td>
         </tr>
         <tr>

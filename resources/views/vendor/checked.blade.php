@@ -23,7 +23,7 @@
                         <div class="col-12">
                             <div class="card mb-4">
                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h3 class="card-title m-0">Vendor Master Form</h3>
+                                    <h3 class="card-title m-0">Supplier Master Form</h3>
                                     <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#actionModal">
                                         Approve
                                     </button>
@@ -189,13 +189,13 @@
 
 
                                         @csrf
-                                        <h3><strong>Vendor Master Request Form</strong></h3>
+                                        <h3><strong>Supplier Master Request Form</strong></h3>
                                         <div class="row">
                                             <!-- Master Section -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="vendor_account_number" class="form-label">Vendor Account Number</label>
+                                                <label for="vendor_account_number" class="form-label">Supplier Account Number</label>
                                                 <input value="{{ $data->vendor_account_number }}" type="text" class="form-control" id="vendor_account_number" name="vendor_account_number" required @if(Auth::user()->level != 5) readonly @endif>
-                                                <small class="text-danger form-text">(Enter vendor account number only for vendor employee and vendor inter company)</small>
+                                                <small class="text-danger form-text">(Enter Supplier account number only for Supplier employee and Supplier inter company)</small>
                                             </div>
                                         </form>
                                             <div class="col-md-6 mb-3">
@@ -208,9 +208,9 @@
                                                 @endforeach
                                             </div>
                                             <div class="col-md-12 mb-3">
-                                                <label for="previous_sap_vendor_number" class="form-label">Previous SAP Vendor Number</label>
+                                                <label for="previous_sap_vendor_number" class="form-label">Previous SAP Supplier Number</label>
                                                 <input readonly value="{{$data->latestChange->previous_sap_vendor_number}}" type="text" class="form-control" id="previous_sap_vendor_number" name="previous_sap_vendornumber">
-                                                <small class="text-danger form-text">Note<span class="text-danger">*</span> : For Change, Block, Delete please enter the previous SAP Vendor number</small>
+                                                <small class="text-danger form-text">Note<span class="text-danger">*</span> : For Change, Block, Delete please enter the previous SAP Supplier number</small>
                                             </div>
 
                                             <!-- Reference Section -->
@@ -219,7 +219,7 @@
                                                 <input readonly value="3000" type="text" class="form-control" id="company_code" name="company_code" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label for="vendor_name" class="form-label">Vendor Name</label>
+                                                <label for="vendor_name" class="form-label">Supplier Name</label>
                                                 <input readonly value="{{$data->vendor_name}}" type="text" class="form-control" id="vendor_name" name="vendor_name">
                                             </div>
 
@@ -489,7 +489,7 @@
                                 <div class="card-body">
                                     <!-- Display Vendor Master Details -->
                                     <h2>{{ $data->vendor_name }}</h2>
-                                    <p>Vendor Account Number: {{ $data->vendor_account_number }}</p>
+                                    <p>Supplier Account Number: {{ $data->vendor_account_number }}</p>
                                     <!-- Display other details as needed -->
 
                                     <!-- Display Latest Change Details -->
@@ -531,7 +531,7 @@
                                             </tbody>
                                         </table>
                                     @else
-                                        <p>No logs found for this vendor master.</p>
+                                        <p>No logs found for this Supplier master.</p>
                                     @endif
                                 </div>
                             </div>

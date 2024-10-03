@@ -27,17 +27,17 @@
     </style>
 </head>
 <body>
-    <h2>Vendor Form Completed</h2>
-    <p>The vendor form with account number {{ $vendorMaster->vendor_account_number }} has been completed.</p>
+    <h2>Supplier Form Completed</h2>
+    <p>The Supplier form with account number {{ $vendorMaster->vendor_account_number }} has been completed.</p>
 
-    <h3>Vendor Master Details</h3>
+    <h3>Supplier Master Details</h3>
     <table>
         <tr>
             <th>ID</th>
             <td>{{ $vendorMaster->id }}</td>
         </tr>
         <tr>
-            <th>Vendor Account Number</th>
+            <th>Supplier Account Number</th>
             <td>{{ $vendorMaster->vendor_account_number }}</td>
         </tr>
         <tr>
@@ -49,7 +49,7 @@
             <td>{{ $vendorMaster->account_group }}</td>
         </tr>
         <tr>
-            <th>Vendor Name</th>
+            <th>Supplier Name</th>
             <td>{{ $vendorMaster->vendor_name }}</td>
         </tr>
         <tr>
@@ -174,7 +174,7 @@
         </tr>
     </table>
 
-    <h3>Vendor Change Details</h3>
+    <h3>Supplier Change Details</h3>
     <table>
         <tr>
             <th>ID</th>

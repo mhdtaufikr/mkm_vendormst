@@ -50,7 +50,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Vendor Name</th>
+                                        <th>Supplier Name</th>
                                         <th>Change Type</th>
                                         <th>Action</th>
                                     </tr>

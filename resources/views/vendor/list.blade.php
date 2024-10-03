@@ -23,12 +23,12 @@
                     <div class="col-auto mt-4">
                         <h1 class="page-header-title">
                             <div class="page-header-icon"><i class="fas fa-database"></i></div>
-                            Master Vendor
+                            Master Supplier
                         </h1>
                     </div>
                     <div class="col-12 col-xl-auto mt-4">
                         <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#uploadMasterPart">
-                            <i class="fas fa-file-excel"></i> Master Vendor
+                            <i class="fas fa-file-excel"></i> Master Supplier
                         </button>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">List of Master Vendor</h3>
+                <h3 class="card-title">List of Master Supplier</h3>
               </div>
 
               <!-- /.card-header -->
@@ -175,8 +175,8 @@
                         <thead>
                         <tr>
                             <th>No</th>
-                            <th>Vendor Name</th>
-                            <th>Vendor Account Number</th>
+                            <th>Supplier Name</th>
+                            <th>Supplier Account Number</th>
                             <th>Approval Route</th>
                             <th>Action</th>
                         </tr>
@@ -295,7 +295,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-logLabel">Vendor Log</h5>
+                <h5 class="modal-title" id="modal-logLabel">Supplier Log</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
