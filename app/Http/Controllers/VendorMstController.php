@@ -188,7 +188,7 @@ class VendorMstController extends Controller
 
             // Allow multiple file types (pdf, doc, docx, xlsx, images, etc.)
             'files' => 'nullable|array', // Allow multiple files as an array
-            'files.*' => 'nullable|file|mimes:pdf,doc,docx,xlsx,jpg,jpeg,png,gif,bmp|max:2048', // Validate each file with multiple formats
+            'files.*' => 'nullable|file|mimes:pdf,doc,docx,xlsx,jpg,jpeg,png,gif,bmp|max:5048', // Validate each file with multiple formats
         ]);
 
         // Extract and prepare account_group and withholding_tax for saving as pipe-separated strings
