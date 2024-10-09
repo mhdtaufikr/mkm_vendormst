@@ -28,8 +28,10 @@ class VendorMstController extends Controller
 {
     public function index()
 {
-    // Fetch all vendor masters with their changes and related approvals, including logs and timestamps
-    $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])->get();
+    // Fetch all vendor masters with their changes and related approvals, sorted by the newest data
+    $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])
+        ->orderBy('created_at', 'desc') // Sort by created_at in descending order (newest first)
+        ->get();
 
     // Fetch all users to map id to name
     $users = User::select('id', 'username')->get()->pluck('username', 'id');
@@ -99,6 +101,7 @@ class VendorMstController extends Controller
 
     return view('vendor.list', compact('items', 'dropdown'));
 }
+
 
 
 
