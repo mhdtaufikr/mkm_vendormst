@@ -194,9 +194,18 @@
                                             <!-- Master Section -->
                                             <div class="col-md-6 mb-3">
                                                 <label for="vendor_account_number" class="form-label">Supplier Account Number</label>
-                                                <input value="{{ $data->vendor_account_number }}" type="text" class="form-control" id="vendor_account_number" name="vendor_account_number" required @if(Auth::user()->level != 5) readonly @endif>
+                                                <input
+                                                    value="{{ $data->vendor_account_number }}"
+                                                    type="text"
+                                                    class="form-control @if(Auth::user()->level == 5) required @endif"
+                                                    id="vendor_account_number"
+                                                    name="vendor_account_number"
+                                                    @if(Auth::user()->level != 5) readonly @endif
+                                                    @if(Auth::user()->level == 5) required @endif
+                                                >
                                                 <small class="text-danger form-text">(Enter Supplier account number only for Supplier employee and Supplier inter company)</small>
                                             </div>
+
                                         </form>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Change Type</label><br>

@@ -270,7 +270,7 @@ class VendorMstController extends Controller
         }
 
         // Redirect or return a response as needed
-        return redirect('/mst/vendor')->with('status', 'success input master vendor');
+        return redirect('/mst/vendor')->with('status', 'success input master Supplier');
     }
 
 

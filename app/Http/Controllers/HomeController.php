@@ -27,19 +27,26 @@ class HomeController extends Controller
 
         // Apply the filter based on requesters
         $pendingList->whereHas('vendor', function ($query) use ($approvalRouteRequesters) {
-            $query->whereIn('created_by', function ($query) use ($approvalRouteRequesters) {
-                $query->select('id')
+            $query->whereIn('created_by', function ($subquery) use ($approvalRouteRequesters) {
+                $subquery->select('id')
                     ->from('users')
                     ->whereIn('username', $approvalRouteRequesters);
             });
         });
     } elseif ($userLevel == 2) {
-        // Step 3: For level 2, filter by department
+        // Fetch vendor changes where the creator's department matches the current user's department
         $pendingList->whereHas('vendor', function ($query) use ($userDept) {
-            $query->where('department', $userDept);
+            $query->whereIn('created_by', function ($subquery) use ($userDept) {
+                // Fetch department from users based on who created the vendor change
+                $subquery->select('id')
+                    ->from('users')
+                    ->where('dept', $userDept); // Match creator's department
+            });
         });
+    } elseif ($userLevel > 2) {
+        // For levels greater than 2, no need to filter by department, just filter by level
+        $pendingList->where('level', $userLevel);
     }
-    // No additional filters for level 3 and above; only filtering by level
 
     // Get the filtered result
     $pendingList = $pendingList->get();
@@ -47,6 +54,7 @@ class HomeController extends Controller
     // Return the filtered list to the view
     return view('home.index', compact('pendingList'));
 }
+
 
 
 

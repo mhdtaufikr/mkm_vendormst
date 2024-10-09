@@ -49,7 +49,7 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th>No.</th>
                                         <th>Supplier Name</th>
                                         <th>Change Type</th>
                                         <th>Action</th>
@@ -62,7 +62,7 @@
                                             <td>{{ $item->vendor->name }}</td>
                                             <td>{{ $item->change_type }}</td>
                                             <td>
-                                                <a href="{{ url('/vendor/checked/' .encrypt($item->id) ) }}" class="btn btn-primary btn-sm">
+                                                <a href="{{ url('/vendor/checked/' .encrypt($item->vendor_id) ) }}" class="btn btn-primary btn-sm">
                                                     Approve
                                                 </a>
                                             </td>
