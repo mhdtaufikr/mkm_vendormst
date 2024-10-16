@@ -81,20 +81,23 @@ class VendorMstController extends Controller
                         return $route->dept . '-' . $route->level; // Separate by both department and level for internal grouping
                     });
 
-                    // Attach the grouped approval routes to the change for display in the view
                     $change->groupedApprovalRoutes = $groupedRoutes->map(function ($routes) {
                         // Apply color based on status
                         return $routes->map(function($route) {
-                            $colorClass = match($route->status) {
-                                'Approved' => 'text-success', // Green
-                                'Pending' => 'text-warning',  // Orange
-                                default => 'text-muted',      // Grey for "Not yet reviewed"
-                            };
+                            // Use if-else instead of match for compatibility with older PHP versions
+                            if ($route->status === 'Approved') {
+                                $colorClass = 'text-success'; // Green
+                            } elseif ($route->status === 'Pending') {
+                                $colorClass = 'text-warning'; // Orange
+                            } else {
+                                $colorClass = 'text-muted'; // Grey for "Not yet reviewed"
+                            }
 
                             // Return name with color class applied
                             return "<span class=\"{$colorClass}\">{$route->name} - ({$route->status})</span>";
                         })->implode(' , ');
                     });
+
 
                     // Determine all pending approvers for the current level
                     $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
