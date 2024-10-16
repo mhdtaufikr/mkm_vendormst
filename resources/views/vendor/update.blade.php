@@ -384,11 +384,11 @@
 
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="bank_key" class="form-label">Bank Key</label>
+                                                        <label for="bank_key" class="form-label">Bank Account Number</label>
                                                         <input value="{{$data->bank_key}}" type="text" class="form-control" id="bank_key" name="bank_key" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="bank_account" class="form-label">Bank Account<span class="text-danger">*</span></label>
+                                                        <label for="bank_account" class="form-label">Bank Name<span class="text-danger">*</span></label>
                                                         <input value="{{$data->bank_account}}" type="text" class="form-control" id="bank_account" name="bank_account" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
@@ -400,7 +400,7 @@
                                                         <input value="{{$data->bank_region}}" type="text" class="form-control" id="bank_region" name="bank_region">
                                                     </div>
                                                     <div class="col-md-3 mb-3">
-                                                        <label for="confirm_with" class="form-label">Confirm With</label>
+                                                        <label for="confirm_with" class="form-label">Confirm With PIC Supplier</label>
                                                         <input value="{{$data->confirm_with}}" type="text" class="form-control" id="confirm_with" name="confirm_with" required>
                                                     </div>
                                                     <div class="col-md-3 mb-3">
@@ -412,7 +412,7 @@
                                                         <input value="{{$data->date}}" type="date" class="form-control" id="date" name="date" required >
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="confirmed_by" class="form-label">Confirm By</label>
+                                                        <label for="confirmed_by" class="form-label">Confirm By PIC MKM</label>
                                                         <input value="{{$data->confirm_by}}" type="text" class="form-control" id="confirmed_by" name="confirmed_by" required>
                                                     </div>
                                                 </div>
@@ -484,9 +484,75 @@
                                                         <input type="checkbox" class="form-check-input" id="payment_block" name="payment_block"
                                                                @if($data->payment_block) checked @endif>
                                                                <br>
-                                                               <label for="file" class="form-label">Upload File</label>
-                                                        <input name="file" type="file" class="form-control">
-                                                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                                                               <!-- File upload section -->
+                                                               <div class="mb-3">
+                                                                   <label for="fileInput">Upload Files</label>
+                                                                   <input id="fileInput" type="file" name="files[]" class="form-control" multiple> <!-- Correct name attribute -->
+
+                                                                   <!-- Add to Basket button -->
+                                                                   <button type="button" id="addToBasket" class="btn btn-primary mt-2">Add to Basket</button>
+
+                                                                   <!-- Basket of selected files -->
+                                                                   <ul class="list-group mt-3" id="fileBasket"></ul>
+                                                               </div>
+
+                                                               <script>
+                                                                   let filesInBasket = [];
+
+                                                                   document.getElementById('addToBasket').addEventListener('click', function () {
+                                                                       const fileInput = document.getElementById('fileInput');
+                                                                       const fileBasket = document.getElementById('fileBasket');
+
+                                                                       // Loop through the selected files and add them to the basket
+                                                                       Array.from(fileInput.files).forEach(file => {
+                                                                           filesInBasket.push(file);
+                                                                           const li = document.createElement('li');
+                                                                           li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                                                                           li.innerHTML = `
+                                                                               <span>${file.name}</span>
+                                                                               <button type="button" class="btn btn-danger btn-sm remove-file">Remove</button>
+                                                                           `;
+                                                                           fileBasket.appendChild(li);
+                                                                       });
+
+                                                                       // Clear the input after adding to the basket
+                                                                       fileInput.value = '';
+                                                                   });
+
+                                                                   // Handle remove file action
+                                                                   document.getElementById('fileBasket').addEventListener('click', function (e) {
+                                                                       if (e.target.classList.contains('remove-file')) {
+                                                                           const fileItem = e.target.parentElement;
+                                                                           const fileName = fileItem.querySelector('span').textContent;
+
+                                                                           // Remove from the basket array
+                                                                           filesInBasket = filesInBasket.filter(file => file.name !== fileName);
+
+                                                                           // Remove from the DOM
+                                                                           fileItem.remove();
+                                                                       }
+                                                                   });
+
+                                                                   // Handle form submission (append files to file input)
+                                                                   document.querySelector('form').addEventListener('submit', function (e) {
+                                                                       const fileInput = document.getElementById('fileInput');
+                                                                       const dataTransfer = new DataTransfer();
+
+                                                                       // Add all files in the basket to the DataTransfer object
+                                                                       filesInBasket.forEach(file => {
+                                                                           dataTransfer.items.add(file);
+                                                                       });
+
+                                                                       // Set the file input's files property to the DataTransfer's files
+                                                                       fileInput.files = dataTransfer.files;
+                                                                   });
+                                                               </script>
+
+
+
+                                                               <div class="d-flex justify-content-center">
+                                                                   <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                                                               </div>
                                                     </div>
                                                 </div>
                                             </div>

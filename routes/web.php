@@ -33,7 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mst/form', [HomeController::class, 'form']);
 
     //Vendor Master
-    Route::get('/mst/vendor', [VendorMstController::class, 'index']);
+    Route::get('/mst/vendor', [VendorMstController::class, 'index'])->name('mst.vendor');
     Route::get('/mst/vendor/form', [VendorMstController::class, 'form']);
     Route::post('/vendor/store', [VendorMstController::class, 'store']);
     Route::get('/vendor/detail/{id}', [VendorMstController::class, 'detail']);

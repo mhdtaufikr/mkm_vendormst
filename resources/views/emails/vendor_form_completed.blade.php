@@ -121,11 +121,11 @@
             <td>{{ $vendorMaster->npwp }}</td>
         </tr>
         <tr>
-            <th>Bank Key</th>
+            <th>Bank Account Number</th>
             <td>{{ $vendorMaster->bank_key }}</td>
         </tr>
         <tr>
-            <th>Bank Account</th>
+            <th>Bank Name</th>
             <td>{{ $vendorMaster->bank_account }}</td>
         </tr>
         <tr>

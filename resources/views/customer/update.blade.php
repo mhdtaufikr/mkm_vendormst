@@ -372,11 +372,11 @@
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="bank_key" class="form-label">Bank Key</label>
+                                                        <label for="bank_key" class="form-label">Bank Account Number</label>
                                                         <input value="{{ $data->bank_key }}" type="text" class="form-control" id="bank_key" name="bank_key" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="bank_account" class="form-label">Bank Account<span class="text-danger">*</span></label>
+                                                        <label for="bank_account" class="form-label">Bank Name<span class="text-danger">*</span></label>
                                                         <input value="{{ $data->bank_account }}" type="text" class="form-control" id="bank_account" name="bank_account" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
@@ -388,7 +388,7 @@
                                                         <input value="{{ $data->bank_region }}" type="text" class="form-control" id="bank_region" name="bank_region">
                                                     </div>
                                                     <div class="col-md-3 mb-3">
-                                                        <label for="confirm_with" class="form-label">Confirm With</label>
+                                                        <label for="confirm_with" class="form-label">Confirm With PIC Supplier</label>
                                                         <input value="{{ $data->confirm_with }}" type="text" class="form-control" id="confirm_with" name="confirm_with" required>
                                                     </div>
                                                     <div class="col-md-3 mb-3">
@@ -400,7 +400,7 @@
                                                         <input value="{{ $data->date }}" type="date" class="form-control" id="date" name="date" required>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="confirmed_by" class="form-label">Confirm By</label>
+                                                        <label for="confirmed_by" class="form-label">Confirm By PIC MKM</label>
                                                         <input value="{{ $data->confirm_by }}" type="text" class="form-control" id="confirmed_by" name="confirmed_by" required>
                                                     </div>
                                                 </div>

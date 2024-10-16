@@ -23,75 +23,92 @@ use App\Exports\VendorTemplateExport;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\VendorImport;
+use Yajra\DataTables\Facades\DataTables;
+
 
 class VendorMstController extends Controller
 {
-    public function index()
+    public function index(Request $request)
 {
-    // Fetch all vendor masters with their changes and related approvals, sorted by the newest data
-    $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])
-        ->orderBy('created_at', 'desc') // Sort by created_at in descending order (newest first)
-        ->get();
+    if ($request->ajax()) {
+        $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])
+            ->orderBy('created_at', 'desc');
 
-    // Fetch all users to map id to name
-    $users = User::select('id', 'username')->get()->pluck('username', 'id');
+        return DataTables::eloquent($items)
+            ->addColumn('approval_route', function($data) {
+                // Fetch all users to map id to name
+                $users = User::select('id', 'username')->get()->pluck('username', 'id');
 
-    // Fetch distinct approval routes based on level
-    $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
-        ->orderBy('level', 'asc')
-        ->get();
+                // Fetch distinct approval routes based on level
+                $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
+                    ->orderBy('level', 'asc') // Order by level to maintain separation of levels within the same department
+                    ->get();
 
-    // Determine approval status for each vendor change
-    foreach ($items as $item) {
-        foreach ($item->vendorChanges as $change) {
-            // Get the name of the creator using the created_by id from the vendor changes
-            $createdByName = $users->get($change->created_by);
+                foreach ($data->vendorChanges as $change) {
+                    // Get the name of the creator using the created_by id from the vendor changes
+                    $createdByName = $users->get($change->created_by);
 
-            // Filter approval routes based on the mapped name from the users table
-            $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName) {
-                // If 'requester' matches 'created_by' name or 'requester' is null (default route)
-                return $route->requester === $createdByName || is_null($route->requester);
-            });
+                    // Filter approval routes based on the mapped name from the users table
+                    $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName) {
+                        return $route->requester === $createdByName || is_null($route->requester);
+                    });
 
-            $currentLevel = $change->level; // The current level of the vendor change process
+                    $currentLevel = $change->level;
 
-            // Add status and timestamp to each distinct route in the filtered approval routes
-            foreach ($filteredRoutes as $route) {
-                // Find logs for this approver and level
-                $approvalLog = $change->logs->firstWhere('approver.name', $route->name);
+                    // Add status and timestamp to each distinct route in the filtered approval routes
+                    foreach ($filteredRoutes as $route) {
+                        $approvalLog = $change->logs->firstWhere('approver.name', $route->name);
 
-                if ($route->level < $currentLevel) {
-                    $route->status = 'Approved';
-                    $route->timestamp = $approvalLog ? $approvalLog->approval_timestamp : null;
-                } elseif ($route->level == $currentLevel) {
-                    // If the approval log exists and the action is "Approved", set status as approved
-                    if ($approvalLog && $approvalLog->approval_action === 'Approved') {
-                        $route->status = 'Approved';
-                        $route->timestamp = $approvalLog->approval_timestamp;
-                    } else {
-                        $route->status = 'Pending'; // If not approved, show as Pending
-                        $route->timestamp = null; // No timestamp for pending actions
+                        if ($route->level < $currentLevel) {
+                            $route->status = 'Approved';
+                            $route->timestamp = $approvalLog ? $approvalLog->approval_timestamp : null;
+                        } elseif ($route->level == $currentLevel) {
+                            if ($approvalLog && $approvalLog->approval_action === 'Approved') {
+                                $route->status = 'Approved';
+                                $route->timestamp = $approvalLog->approval_timestamp;
+                            } else {
+                                $route->status = 'Pending';
+                                $route->timestamp = null;
+                            }
+                        } else {
+                            $route->status = 'Not yet reviewed';
+                            $route->timestamp = null;
+                        }
                     }
-                } else {
-                    $route->status = 'Not yet reviewed';
-                    $route->timestamp = null; // No timestamp for not reviewed actions
+
+                    // Group routes by department and separate lines for different levels within the same department
+                    $groupedRoutes = $filteredRoutes->groupBy(function($route) {
+                        return $route->dept . '-' . $route->level; // Separate by both department and level for internal grouping
+                    });
+
+                    // Attach the grouped approval routes to the change for display in the view
+                    $change->groupedApprovalRoutes = $groupedRoutes->map(function ($routes) {
+                        // Apply color based on status
+                        return $routes->map(function($route) {
+                            $colorClass = match($route->status) {
+                                'Approved' => 'text-success', // Green
+                                'Pending' => 'text-warning',  // Orange
+                                default => 'text-muted',      // Grey for "Not yet reviewed"
+                            };
+
+                            // Return name with color class applied
+                            return "<span class=\"{$colorClass}\">{$route->name} - ({$route->status})</span>";
+                        })->implode(' , ');
+                    });
+
+                    // Determine all pending approvers for the current level
+                    $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
+                    $change->latestPending = !empty($pendingApprovers) ? implode(' & ', $pendingApprovers) : 'Approved';
                 }
-            }
 
-            // Attach the filtered approval routes to the change for display in the view
-            $change->approvalRoutes = $filteredRoutes->map(function ($route) {
-                return clone $route; // Clone the route to avoid reference issues
-            });
-
-            // Determine all pending approvers for the current level
-            $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
-            if (!empty($pendingApprovers)) {
-                // Concatenate all pending names with " & " separator
-                $change->latestPending = implode(' & ', $pendingApprovers);
-            } else {
-                $change->latestPending = 'Approved';
-            }
-        }
+                // Render the HTML content for approval routes using the view
+                return view('vendor.partials.approval_route', compact('data'))->render();
+            })
+            ->addColumn('action', function($data) {
+                return view('vendor.partials.actions', compact('data'))->render();
+            })
+            ->rawColumns(['approval_route', 'action']) // Enable raw HTML rendering
+            ->make(true);
     }
 
     // Fetch dropdown data for form filtering or selection
@@ -99,8 +116,9 @@ class VendorMstController extends Controller
         ->orderBy('name_value', 'asc')
         ->get();
 
-    return view('vendor.list', compact('items', 'dropdown'));
+    return view('vendor.list', compact('dropdown'));
 }
+
 
 
 
@@ -443,77 +461,87 @@ public function storeUpdate(Request $request)
         return redirect()->back()->with('error', 'The data is still under approval and cannot be updated at this moment.');
     }
 
-    // Find the existing vendor record
-    $vendorMaster = VendorMaster::findOrFail($validatedData['id']);
+ // Find the existing vendor record
+$vendorMaster = VendorMaster::findOrFail($validatedData['id']);
 
-    // Handle file upload if exists
-    if ($request->hasFile('file')) {
-        // Delete the old file if exists
-        if ($vendorMaster->file && file_exists(public_path($vendorMaster->file))) {
-            unlink(public_path($vendorMaster->file));
-        }
+if ($request->hasFile('files')) {
+    // Check if there are existing files in the vendor record
+    $existingFiles = $vendorMaster->file ? json_decode($vendorMaster->file, true) : [];
 
-        // Move the uploaded file to public/assets/upload directory
-        $file = $request->file('file');
+    // Ensure $existingFiles is always an array, even if it's empty or null
+    if (!is_array($existingFiles)) {
+        $existingFiles = [];
+    }
+
+    // Handle multiple file uploads and append each to the existing files
+    foreach ($request->file('files') as $file) {
         $fileName = uniqid() . '_' . $file->getClientOriginalName();
         $destinationPath = public_path('assets/upload');
         $file->move($destinationPath, $fileName);
 
-        // Add file path to validated data for database storage
-        $validatedData['file'] = 'assets/upload/' . $fileName;
-    } else {
-        // Keep the old file path if no new file uploaded
-        $validatedData['file'] = $vendorMaster->file;
+        // Add the new file path to the array of existing files
+        $existingFiles[] = 'assets/upload/' . $fileName;
     }
 
-    // Update the vendor record in vendor_masters table
-    $vendorMaster->update(array_merge($validatedData, [
-        'account_group' => $accountGroup,
-        'withholding_tax' => $withholdingTax,
-        'payment_block' => $paymentBlock,
-        'confirm_info' => $confirmInfo,
-    ]));
-
-    // Update the vendor change record with status 'Pending' and level 1
-    $vendorChange->update([
-        'change_type' => $validatedData['change_type'],
-        'previous_sap_vendor_number' => $validatedData['previous_sap_vendornumber'],
-        'remarks' => $validatedData['Remarks'] ?? '',
-        'status' => 'Pending', // Set initial status as pending
-        'created_by' => Auth::id(), // Assuming you have authentication and get the current user's ID
-        'level' => 1, // Update level to 1 after processing
+    // Update the 'file' field in the database with the new JSON-encoded array of files
+    $vendorMaster->update([
+        'file' => json_encode($existingFiles),
     ]);
+} else {
+    // If no new files are uploaded, keep the existing 'file' field unchanged
+    $validatedData['file'] = $vendorMaster->file;
+}
 
-    // Create a new approval log entry in approval_log_vendor table
-    $approvalLog = new ApprovalLogVendor();
-    $approvalLog->vendor_change_id = $vendorChange->id;
-    $approvalLog->approver_id = Auth::id();
-    $approvalLog->approval_action = 'Update';
-    $approvalLog->approval_comments = 'Vendor information updated';
-    $approvalLog->approval_timestamp = now()->toDateTimeString(); // Current timestamp
-    $approvalLog->approval_level = 0;
-    $approvalLog->save();
+// Now update the rest of the vendor record, excluding the file handling
+$vendorMaster->update(array_merge($validatedData, [
+    'account_group' => $accountGroup,
+    'withholding_tax' => $withholdingTax,
+    'payment_block' => $paymentBlock,
+    'confirm_info' => $confirmInfo,
+]));
 
-    // Handle approval routing
-    $user = Auth::user();
-    $userDept = $user->dept;
-    $userName = $user->username;
 
-    // Find approvers based on dept and requester
-    $approvalRoutes = ApprovalRoute::where('dept', $userDept)
-        ->where('requester', $userName)
-        ->where('level', 1)
-        ->get();
-    foreach ($approvalRoutes as $route) {
-        // Send approval email to each approver
-        $vendorId = $vendorMaster->id;
-        $approverEmail = $route->email;
-        $approvalName = $route->name;
-        $approvalLink = url("/vendor/checked/" . encrypt($vendorId));
 
-        // Send email
-        Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink, $approvalName));
-    }
+        // Update the vendor change record with status 'Pending' and level 1
+        $vendorChange->update([
+            'change_type' => $validatedData['change_type'],
+            'previous_sap_vendor_number' => $validatedData['previous_sap_vendornumber'],
+            'remarks' => $validatedData['Remarks'] ?? '',
+            'status' => 'Pending', // Set initial status as pending
+            'created_by' => Auth::id(), // Assuming you have authentication and get the current user's ID
+            'level' => 1, // Update level to 1 after processing
+        ]);
+
+        // Create a new approval log entry in approval_log_vendor table
+        $approvalLog = new ApprovalLogVendor();
+        $approvalLog->vendor_change_id = $vendorChange->id;
+        $approvalLog->approver_id = Auth::id();
+        $approvalLog->approval_action = 'Update';
+        $approvalLog->approval_comments = 'Vendor information updated';
+        $approvalLog->approval_timestamp = now()->toDateTimeString(); // Current timestamp
+        $approvalLog->approval_level = 0;
+        $approvalLog->save();
+
+        // Handle approval routing
+        $user = Auth::user();
+        $userDept = $user->dept;
+        $userName = $user->username;
+
+        // Find approvers based on dept and requester
+        $approvalRoutes = ApprovalRoute::where('dept', $userDept)
+            ->where('requester', $userName)
+            ->where('level', 1)
+            ->get();
+        foreach ($approvalRoutes as $route) {
+            // Send approval email to each approver
+            $vendorId = $vendorMaster->id;
+            $approverEmail = $route->email;
+            $approvalName = $route->name;
+            $approvalLink = url("/vendor/checked/" . encrypt($vendorId));
+
+            // Send email
+            Mail::to($approverEmail)->send(new VendorApprovalMail($vendorMaster, $approvalLink, $approvalName));
+        }
 
     // Redirect or return a response as needed
     return redirect('/mst/vendor')->with('status', 'Vendor updated successfully and approval process started.');

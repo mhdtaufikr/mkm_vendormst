@@ -348,7 +348,7 @@
                                                     <input readonly value="{{$data->bank_key}}" type="text" class="form-control" id="bank_key" name="bank_key" required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="bank_account" class="form-label">Bank Account<span class="text-danger">*</span></label>
+                                                    <label for="bank_account" class="form-label">Bank Name<span class="text-danger">*</span></label>
                                                     <input readonly value="{{$data->bank_account}}" type="text" class="form-control" id="bank_account" name="bank_account" required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
@@ -360,7 +360,7 @@
                                                     <input readonly value="{{$data->bank_region}}" type="text" class="form-control" id="bank_region" name="bank_region">
                                                 </div>
                                                 <div class="col-md-3 mb-3">
-                                                    <label for="confirm_with" class="form-label">Confirm With</label>
+                                                    <label for="confirm_with" class="form-label">Confirm With PIC Supplier</label>
                                                     <input readonly value="{{$data->confirm_with}}" type="text" class="form-control" id="confirm_with" name="confirm_with" required>
                                                 </div>
                                                 <div class="col-md-3 mb-3">
@@ -372,7 +372,7 @@
                                                     <input readonly value="{{$data->date}}" type="date" class="form-control" id="date" name="date" required >
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="confirmed_by" class="form-label">Confirm By</label>
+                                                    <label for="confirmed_by" class="form-label">Confirm By PIC MKM</label>
                                                     <input readonly value="{{$data->confirm_by}}" type="text" class="form-control" id="confirmed_by" name="confirmed_by" required>
                                                 </div>
                                             </div>
@@ -455,6 +455,62 @@
                                 <!-- /.card-body -->
                             </div>
                             <!-- /.card -->
+
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h3 class="card-title">Uploaded Files</h3>
+                                </div>
+                                <div class="card-body">
+                                    @php
+                                        // Decode the JSON-encoded 'file' field from the database
+                                        $files = json_decode($data->file, true);
+                                    @endphp
+
+                                    @if($files && is_array($files) && count($files) > 0)
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 10%">Icon</th>
+                                                    <th style="width: 70%">File Name</th>
+                                                    <th style="width: 20%">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($files as $file)
+                                                    @php
+                                                        // Get the file extension for the icon
+                                                        $fileExtension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                                                    @endphp
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            @if(in_array($fileExtension, ['xls', 'xlsx']))
+                                                                <i class="fas fa-file-excel fa-2x text-success"></i> <!-- Excel Icon -->
+                                                            @elseif(in_array($fileExtension, ['pdf']))
+                                                                <i class="fas fa-file-pdf fa-2x text-danger"></i> <!-- PDF Icon -->
+                                                            @elseif(in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                                <i class="fas fa-file-image fa-2x text-primary"></i> <!-- Image Icon -->
+                                                            @elseif(in_array($fileExtension, ['doc', 'docx']))
+                                                                <i class="fas fa-file-word fa-2x text-info"></i> <!-- Word Icon -->
+                                                            @else
+                                                                <i class="fas fa-file-alt fa-2x text-secondary"></i> <!-- Default File Icon -->
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ basename($file) }}</td>
+                                                        <td>
+                                                            <a href="{{ asset($file) }}" class="btn btn-primary btn-sm" download>
+                                                                Download
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    @else
+                                        <p>No files uploaded.</p>
+                                    @endif
+                                </div>
+                            </div>
+
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h3 class="card-title m-0">Log Form</h3>
