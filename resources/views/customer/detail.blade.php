@@ -197,37 +197,160 @@
                                             <label for="npwp" class="form-label">NPWP</label>
                                             <input readonly value="{{ $data->npwp }}" type="text" class="form-control" id="npwp" name="npwp">
                                         </div>
+
+
+                                   <!-- Payment Control Section -->
+                                   <div class="col-md-6 mb-3">
+                                    <label for="currency" class="form-label">Currency<span class="text-danger">*</span></label>
+                                    <select disabled class="form-control" id="currency" name="currency" required>
+                                        <option value="">Select a currency</option>
+                                        @foreach ($currencyArray as $currency)
+                                            <option value="{{ $currency['code'] }}" @if($data->currency == $currency['code']) selected @endif>
+                                                {{ $currency['name'] }} ({{ $currency['code'] }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bank_key" class="form-label">Bank Key</label>
+                                    <input readonly value="{{$data->bank_key}}" type="text" class="form-control" id="bank_key" name="bank_key" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bank_account" class="form-label">Bank Account<span class="text-danger">*</span></label>
+                                    <input readonly value="{{$data->bank_account}}" type="text" class="form-control" id="bank_account" name="bank_account" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="account_holder" class="form-label">Account Holder<span class="text-danger">*</span></label>
+                                    <input readonly value="{{$data->account_holder}}" type="text" class="form-control" id="account_holder" name="account_holder">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bank_region" class="form-label">Bank Region<span class="text-danger">*</span></label>
+                                    <input readonly value="{{$data->bank_region}}" type="text" class="form-control" id="bank_region" name="bank_region">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="confirm_with" class="form-label">Confirm With</label>
+                                    <input readonly value="{{$data->confirm_with}}" type="text" class="form-control" id="confirm_with" name="confirm_with" required>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="confirm_with" class="form-label">Email/ No. Handphone</label>
+                                    <input readonly value="{{$data->confirm_info}}" type="text" class="form-control" id="confirm_with" name="email_no_handphone" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="date" class="form-label">Date</label>
+                                    <input readonly value="{{$data->date}}" type="date" class="form-control" id="date" name="date" required >
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="confirmed_by" class="form-label">Confirm By</label>
+                                    <input readonly value="{{$data->confirm_by}}" type="text" class="form-control" id="confirmed_by" name="confirmed_by" required>
+                                </div>
+
+                                <!-- Accounting Information Section -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="recon_account" class="form-label">Recon Account</label>
+                                    <input readonly value="{{$data->recon_account}}" type="text" class="form-control" id="recon_account" name="recon_account">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="sort_key" class="form-label">Sort Key</label>
+                                    <input readonly value="{{$data->sort_key}}" type="text" class="form-control" id="sort_key" name="sort_key">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cash_management_group" class="form-label">Cash Management Group</label>
+                                    <input readonly value="{{$data->cash_management_group}}" type="text" class="form-control" id="cash_management_group" name="cash_management_group">
+                                </div>
+
+                                <!-- Payment Transaction Section -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="payment_terms" class="form-label">Payment Terms</label>
+                                    <input readonly value="{{ $data->payment_terms }}" type="text" class="form-control" id="payment_terms" name="payment_terms">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Payment Method<span class="text-danger">*</span></label><br>
+                                    <div class="form-check form-check-inline">
+                                        <input disabled class="form-check-input" type="radio" name="payment_method" id="cash" value="cash" required @if($data->payment_method == 'cash') checked @endif>
+                                        <label class="form-check-label" for="cash">Cash</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input disabled class="form-check-input" type="radio" name="payment_method" id="transfer" value="transfer" @if($data->payment_method == 'transfer') checked @endif>
+                                        <label class="form-check-label" for="transfer">Transfer</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input disabled class="form-check-input" type="radio" name="payment_method" id="cheque" value="cheque" @if($data->payment_method == 'cheque') checked @endif>
+                                        <label class="form-check-label" for="cheque">Cheque / Giro</label>
+                                    </div>
+                                    <br>
+                                    <div class="mt-4">
+                                        <label for="payment_block" class="form-label">Payment Block</label>
+                                        <input disabled type="checkbox" class="form-check-input" id="payment_block" name="payment_block" @if($data->payment_block) checked @endif>
                                     </div>
 
-                                    <!-- Payment Control Information -->
-                                    <h3><strong>Payment Control Information</strong></h3>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="currency" class="form-label">Currency</label>
-                                            <select disabled class="form-control" id="currency" name="currency">
-                                                <option value="">Select a currency</option>
-                                                @foreach ($currencyArray as $currency)
-                                                    <option value="{{ $currency['code'] }}" @if($data->currency == $currency['code']) selected @endif>{{ $currency['name'] }} ({{ $currency['code'] }})</option>
-                                                @endforeach
-                                            </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Withholding Tax</label>
+                                    @php
+                                        // Split the withholding tax string by the '|' delimiter
+                                        $withholdingTaxes = isset($data->withholding_tax) ? explode('|', $data->withholding_tax) : [];
+                                    @endphp
+                                    @foreach($tax as $option)
+                                        <div class="form-check">
+                                            <input disabled class="form-check-input" type="checkbox" name="withholding_tax[]" id="{{ $option->code_format }}" value="{{ $option->name_value }}" @if(in_array($option->name_value, $withholdingTaxes)) checked @endif>
+                                            <label class="form-check-label" for="{{ $option->code_format }}">
+                                                {{ $option->name_value }}
+                                            </label>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="bank_key" class="form-label">Bank Key</label>
-                                            <input readonly value="{{ $data->bank_key }}" type="text" class="form-control" id="bank_key" name="bank_key">
+                                    @endforeach
+                                </div>
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Uploaded Files</h3>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="bank_account" class="form-label">Bank Account</label>
-                                            <input readonly value="{{ $data->bank_account }}" type="text" class="form-control" id="bank_account" name="bank_account">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="account_holder" class="form-label">Account Holder</label>
-                                            <input readonly value="{{ $data->account_holder }}" type="text" class="form-control" id="account_holder" name="account_holder">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="bank_region" class="form-label">Bank Region</label>
-                                            <input readonly value="{{ $data->bank_region }}" type="text" class="form-control" id="bank_region" name="bank_region">
+                                        <div class="card-body">
+                                            @php
+                                                $files = json_decode($data->file); // Decode the JSON string into a PHP array
+                                            @endphp
+                                            @if($files && is_array($files) && count($files) > 0)
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 10%">Icon</th>
+                                                            <th style="width: 70%">File Name</th>
+                                                            <th style="width: 20%">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($files as $file)
+                                                            @php
+                                                                $fileExtension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                                                            @endphp
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    @if(in_array($fileExtension, ['xls', 'xlsx']))
+                                                                        <i class="fas fa-file-excel fa-2x text-success"></i> <!-- Excel Icon -->
+                                                                    @elseif(in_array($fileExtension, ['pdf']))
+                                                                        <i class="fas fa-file-pdf fa-2x text-danger"></i> <!-- PDF Icon -->
+                                                                    @elseif(in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                                        <i class="fas fa-file-image fa-2x text-primary"></i> <!-- Image Icon -->
+                                                                    @elseif(in_array($fileExtension, ['doc', 'docx']))
+                                                                        <i class="fas fa-file-word fa-2x text-info"></i> <!-- Word Icon -->
+                                                                    @else
+                                                                        <i class="fas fa-file-alt fa-2x text-secondary"></i> <!-- Default File Icon -->
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{ basename($file) }}</td>
+                                                                <td>
+                                                                    <a href="{{ asset($file) }}" class="btn btn-primary btn-sm" download>
+                                                                        Download
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            @else
+                                                <p>No files uploaded.</p>
+                                            @endif
                                         </div>
                                     </div>
+
 
                                     <!-- Log Section -->
                                     <h3><strong>Change Log</strong></h3>

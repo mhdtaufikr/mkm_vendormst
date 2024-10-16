@@ -23,15 +23,82 @@ class CustomerMstController extends Controller
 {
     public function index()
 {
-    // Fetch all customer masters with their current status and approval logs
-    $item = CustomerMaster::with(['changes.approvalLogs.approver'])->get();
+    // Fetch all customer masters with their changes and related approvals, sorted by the newest data
+    $items = CustomerMaster::with(['changes', 'changes.approvalLogs.approver'])
+        ->orderBy('created_at', 'desc') // Sort by created_at in descending order (newest first)
+        ->get();
 
+    // Fetch all users to map id to name
+    $users = User::select('id', 'username')->get()->pluck('username', 'id');
+
+    // Fetch distinct approval routes based on level
+    $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
+        ->orderBy('level', 'asc')
+        ->get();
+
+    // Determine approval status for each customer change
+    foreach ($items as $item) {
+        foreach ($item->changes as $change) {
+            // Get the name of the creator using the created_by id from the customer changes
+            $createdByName = $users->get($change->created_by);
+
+            // Filter approval routes based on the mapped name from the users table
+            $filteredRoutes = $approvalRoutes->filter(function ($route) use ($createdByName) {
+                // If 'requester' matches 'created_by' name or 'requester' is null (default route)
+                return $route->requester === $createdByName || is_null($route->requester);
+            });
+
+            $currentLevel = $change->level; // The current level of the customer change process
+
+            // Add status and timestamp to each distinct route in the filtered approval routes
+            foreach ($filteredRoutes as $route) {
+                // Find logs for this approver and level
+                $approvalLog = $change->approvalLogs->firstWhere('approver.name', $route->name);
+
+                if ($route->level < $currentLevel) {
+                    $route->status = 'Approved';
+                    $route->timestamp = $approvalLog ? $approvalLog->approval_timestamp : null;
+                } elseif ($route->level == $currentLevel) {
+                    // If the approval log exists and the action is "Approved", set status as approved
+                    if ($approvalLog && $approvalLog->approval_action === 'Approved') {
+                        $route->status = 'Approved';
+                        $route->timestamp = $approvalLog->approval_timestamp;
+                    } else {
+                        $route->status = 'Pending'; // If not approved, show as Pending
+                        $route->timestamp = null; // No timestamp for pending actions
+                    }
+                } else {
+                    $route->status = 'Not yet reviewed';
+                    $route->timestamp = null; // No timestamp for not reviewed actions
+                }
+            }
+
+            // Attach the filtered approval routes to the change for display in the view
+            $change->approvalRoutes = $filteredRoutes->map(function ($route) {
+                return clone $route; // Clone the route to avoid reference issues
+            });
+
+            // Determine all pending approvers for the current level
+            $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
+            if (!empty($pendingApprovers)) {
+                // Concatenate all pending names with " & " separator
+                $change->latestPending = implode(' & ', $pendingApprovers);
+            } else {
+                $change->latestPending = 'Approved';
+            }
+        }
+    }
+
+    // Fetch dropdown data for form filtering or selection
     $dropdown = Dropdown::where('category', 'Form')
-                ->orderBy('name_value', 'asc')
-                ->get();
+        ->orderBy('name_value', 'asc')
+        ->get();
 
-    return view('master.list', compact('item', 'dropdown'));
+    // Return the view with the data
+    return view('master.list', compact('items', 'dropdown'));
 }
+
+
 
 
     public function form()
@@ -112,16 +179,20 @@ class CustomerMstController extends Controller
         'sort_key' => 'nullable|string|max:255',
     ]);
 
-    // Handle file upload if exists
-    if ($request->hasFile('file')) {
-        // Move the uploaded file to public/assets/upload directory
-        $file = $request->file('file');
-        $fileName = uniqid() . '_' . $file->getClientOriginalName();
-        $destinationPath = public_path('assets/upload');
-        $file->move($destinationPath, $fileName);
+    // Handle multiple file uploads if exists
+    $filePaths = [];
+    if ($request->hasFile('files')) {
+        foreach ($request->file('files') as $file) {
+            // Generate a unique file name and move the file to the public directory
+            $fileName = uniqid() . '_' . $file->getClientOriginalName();
+            $destinationPath = public_path('assets/upload');
+            $file->move($destinationPath, $fileName);
 
-        // Add file path to validated data for database storage
-        $validatedData['file'] = 'assets/upload/' . $fileName;
+            // Add the file path to the array
+            $filePaths[] = 'assets/upload/' . $fileName;
+        }
+        // Store the file paths as a JSON string
+        $validatedData['file'] = json_encode($filePaths);
     }
 
     // Extract and prepare account_group and withholding_tax for saving as pipe-separated strings
@@ -210,6 +281,14 @@ public function update($id)
     $tax = Dropdown::where('category', 'Withholding Tax')->get();
     $title = Dropdown::where('category', 'Title')->get();
 
+    // Fetch customer data with related logs
+    $data = CustomerMaster::with(['latestChange', 'latestChange.approvalLogs.approver'])->where('id', $id)->first();
+    // Check if there is an associated vendor change record
+    $customerChange = CustomerChange::where('customer_id', $data->id)->first();
+    // Check if the level is 8
+    if ($customerChange->level != 8) {
+        return redirect()->back()->with('failed', 'Data is still under approval and cannot be updated.');
+    }
     // Fetch country data from API
     $response = Http::get('https://restcountries.com/v3.1/all');
     $countries = $response->json();
@@ -234,8 +313,7 @@ public function update($id)
         return strcasecmp($a['name'], $b['name']);
     });
 
-    // Fetch customer data with related logs
-    $data = CustomerMaster::with(['latestChange', 'latestChange.approvalLogs.approver'])->where('id', $id)->first();
+
 
     // Convert the account_group string to an array
     $data->account_group = explode(',', $data->account_group);

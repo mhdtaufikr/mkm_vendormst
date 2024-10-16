@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\CustomerMaster;
 use App\Models\Dropdown;
 use App\Models\VendorChange;
+use App\Models\CustomerChange;
 use App\Models\ApprovalRoute;
 
 class HomeController extends Controller
@@ -16,17 +17,28 @@ class HomeController extends Controller
     $userDept = auth()->user()->dept;
 
     // Step 1: Start the base query for vendor changes matching the user's level
-    $pendingList = VendorChange::with(['vendor', 'logs.approver'])
+    $vendorPendingList = VendorChange::with(['vendor', 'logs.approver'])
         ->where('level', $userLevel);
 
-    // Step 2: Add additional filtering based on the user's level
+    $customerPendingList = CustomerChange::with(['customer', 'logs.approver'])
+        ->where('level', $userLevel);
+
+    // Step 2: Add additional filtering based on the user's level for vendor changes
     if ($userLevel == 1) {
         // Fetch the requesters (usernames) from ApprovalRoute where the current user is an approver
         $approvalRouteRequesters = ApprovalRoute::where('name', auth()->user()->username)
             ->pluck('requester');
 
         // Apply the filter based on requesters
-        $pendingList->whereHas('vendor', function ($query) use ($approvalRouteRequesters) {
+        $vendorPendingList->whereHas('vendor', function ($query) use ($approvalRouteRequesters) {
+            $query->whereIn('created_by', function ($subquery) use ($approvalRouteRequesters) {
+                $subquery->select('id')
+                    ->from('users')
+                    ->whereIn('username', $approvalRouteRequesters);
+            });
+        });
+
+        $customerPendingList->whereHas('customer', function ($query) use ($approvalRouteRequesters) {
             $query->whereIn('created_by', function ($subquery) use ($approvalRouteRequesters) {
                 $subquery->select('id')
                     ->from('users')
@@ -34,8 +46,8 @@ class HomeController extends Controller
             });
         });
     } elseif ($userLevel == 2) {
-        // Fetch vendor changes where the creator's department matches the current user's department
-        $pendingList->whereHas('vendor', function ($query) use ($userDept) {
+        // For vendor changes, filter by department
+        $vendorPendingList->whereHas('vendor', function ($query) use ($userDept) {
             $query->whereIn('created_by', function ($subquery) use ($userDept) {
                 // Fetch department from users based on who created the vendor change
                 $subquery->select('id')
@@ -43,17 +55,45 @@ class HomeController extends Controller
                     ->where('dept', $userDept); // Match creator's department
             });
         });
+
+        // For customer changes, filter by department
+        $customerPendingList->whereHas('customer', function ($query) use ($userDept) {
+            $query->whereIn('created_by', function ($subquery) use ($userDept) {
+                $subquery->select('id')
+                    ->from('users')
+                    ->where('dept', $userDept);
+            });
+        });
     } elseif ($userLevel > 2) {
         // For levels greater than 2, no need to filter by department, just filter by level
-        $pendingList->where('level', $userLevel);
+        $vendorPendingList->where('level', $userLevel);
+        $customerPendingList->where('level', $userLevel);
     }
 
     // Get the filtered result
-    $pendingList = $pendingList->get();
+    $vendorPendingList = $vendorPendingList->get();
+    $customerPendingList = $customerPendingList->get();
+
+    // Merge vendor and customer lists, and include an indicator of which list each entry belongs to
+    $pendingList = collect();
+
+    foreach ($vendorPendingList as $vendor) {
+        $vendor->type = 'Supplier';  // Mark as supplier
+        $pendingList->push($vendor);
+    }
+
+    foreach ($customerPendingList as $customer) {
+        $customer->type = 'Customer'; // Mark as customer
+        $pendingList->push($customer);
+    }
+
+    // Sort the merged list by the 'created_at' field
+    $pendingList = $pendingList->sortByDesc('created_at');
 
     // Return the filtered list to the view
     return view('home.index', compact('pendingList'));
 }
+
 
 
 

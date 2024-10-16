@@ -99,7 +99,7 @@
                     <div class="mb-3 col-sm-12">
                         <a href="{{url('/mst/vendor/form')}}">
                             <button type="button" class="btn btn-dark btn-sm mb-2" >
-                                <i class="fas fa-plus-square"></i>
+                                Add Supplier Master <i class="fas fa-plus-square"></i>
                               </button>
                         </a>
 

@@ -119,21 +119,61 @@
                                                     <th>No</th>
                                                     <th>Customer Name</th>
                                                     <th>Customer Account Number</th>
-                                                    <th>Log Comments</th>
-                                                    <th>Approver Name</th>
+                                                    <th>Approval Route</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @php $no = 1; @endphp
-                                                @foreach ($item as $data)
+                                                @foreach ($items as $data)
                                                     <tr>
                                                         <td>{{ $no++ }}</td>
                                                         <td>{{ $data->name }}</td>
                                                         <td>{{ $data->customer_account_number ?? 'Unregistered' }}</td>
-                                                        <td>{{ $data->latestApprovalLog->approval_comments ?? 'No comments' }}</td>
-                                                        <td>{{ $data->latestApprovalLog->approver->name ?? 'No approver' }}</td>
+                                                        <td>
+                                                            @foreach ($data->changes as $change)
+                                                                <div>
+                                                                    <strong class="{{ $change->latestPending == 'Approved' ? 'text-success' : 'text-warning' }}">
+                                                                        {{ $change->latestPending == 'Approved' ? 'Approved' : 'Pending at ' . $change->latestPending }}
+                                                                    </strong>
 
+                                                                    <button class="btn btn-link btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#approvalRoute{{ $change->id }}" aria-expanded="false" aria-controls="approvalRoute{{ $change->id }}">
+                                                                        Show All
+                                                                    </button>
+                                                                    <div class="collapse" id="approvalRoute{{ $change->id }}">
+                                                                        <ul class="list-unstyled">
+                                                                            @foreach ($change->approvalRoutes->groupBy(function($route) {
+                                                                                return $route->dept . ' (Level ' . $route->level . ')';
+                                                                            }) as $groupKey => $routes)
+                                                                                @php
+                                                                                    $displayDept = explode(' (Level', $groupKey)[0]; // Extract dept name without level
+                                                                                @endphp
+                                                                                <li>
+                                                                                    <strong>{{ $displayDept }}:</strong>
+                                                                                    @foreach ($routes as $route)
+                                                                                        {{ $route->name }} -
+                                                                                        @if ($route->status == 'Approved')
+                                                                                            <span class="text-success">(Approved)</span>
+                                                                                            @if ($route->timestamp)
+                                                                                                <span class="text-muted">{{ date('d/m/Y, H:i', strtotime($route->timestamp)) }}</span>
+                                                                                            @endif
+                                                                                        @elseif ($route->status == 'Pending')
+                                                                                            <span class="text-warning">(Pending)</span>
+                                                                                        @else
+                                                                                            <span class="text-secondary">(Not yet reviewed)</span>
+                                                                                        @endif
+                                                                                        @if (!$loop->last)
+                                                                                            , <!-- Add a comma separator between approvers -->
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    </div>
+
+                                                                </div>
+                                                            @endforeach
+                                                        </td>
                                                         <td>
                                                             <div class="btn-group">
                                                                 <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -164,38 +204,10 @@
                                                             </div>
                                                         </td>
                                                     </tr>
-
-                                                    {{-- Modal Delete --}}
-                                                    <div class="modal fade" id="modal-delete{{ $data->id }}" tabindex="-1" aria-labelledby="modal-delete{{ $data->id }}-label" aria-hidden="true">
-                                                        <div class="modal-dialog">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h4 class="modal-title" id="modal-delete{{ $data->id }}-label">Delete Customer</h4>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                </div>
-                                                                <form action="{{ url('/mst/delete/'.encrypt($data->id)) }}" method="POST">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <div class="modal-body">
-                                                                        <div class="form-group">
-                                                                            Are you sure you want to delete <label for="rule">{{ $data->name }}</label>?
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                                                        <button type="submit" class="btn btn-primary">Delete</button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    {{-- End Modal Delete --}}
-
-
-
                                                 @endforeach
                                             </tbody>
                                         </table>
+
                                     </div>
                                 </div>
                                  <!-- Customer Log Modal -->

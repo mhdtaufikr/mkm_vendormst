@@ -12,9 +12,9 @@
         }
     }
     .page-header .page-header-content {
-  padding-top: 0rem;
-  padding-bottom: 1rem;
-}
+        padding-top: 0rem;
+        padding-bottom: 1rem;
+    }
 </style>
 
 <script src="{{ asset('test.js') }}"></script>
@@ -25,7 +25,6 @@
                 <div class="row align-items-center justify-content-between">
                     <div class="col-auto mt-2">
                         <h1 class="page-header-title">
-                            {{-- <div class="page-header-icon"><i data-feather="file"></i></div> --}}
                             <label id="lblGreetings"></label>
                         </h1>
                     </div>
@@ -33,7 +32,7 @@
             </div>
         </div>
     </header>
-    <!-- Main page content-->
+
     <section class="content">
         <div class="container-fluid">
             <div class="container-xl px-4 mt-n10">
@@ -50,7 +49,8 @@
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Supplier Name</th>
+                                        <th>Form Type</th>
+                                        <th>Name</th>
                                         <th>Change Type</th>
                                         <th>Action</th>
                                     </tr>
@@ -59,10 +59,11 @@
                                     @foreach($pendingList as $index => $item)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $item->vendor->name }}</td>
+                                            <td>{{ $item->type }}</td>
+                                            <td>{{ $item->type == 'Supplier' ? $item->vendor->name : $item->customer->name }}</td>
                                             <td>{{ $item->change_type }}</td>
                                             <td>
-                                                <a href="{{ url('/vendor/checked/' .encrypt($item->vendor_id) ) }}" class="btn btn-primary btn-sm">
+                                                <a href="{{ $item->type == 'Supplier' ? url('/vendor/checked/' .encrypt($item->vendor_id)) : url('/customer/checked/' .encrypt($item->customer_id)) }}" class="btn btn-primary btn-sm">
                                                     Approve
                                                 </a>
                                             </td>
@@ -75,12 +76,11 @@
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
+
     <script>
         var myDate = new Date();
         var hrs = myDate.getHours();
-
         var greet;
 
         if (hrs < 12)
@@ -91,7 +91,7 @@
             greet = 'Good Evening';
 
         document.getElementById('lblGreetings').innerHTML =
-            '<b>' + greet + '</b> and welcome to MKM Vendor Account Request';
+            '<b>' + greet + '</b> and welcome to MKM Vendor and Customer Request';
     </script>
 </main>
 @endsection

@@ -402,8 +402,69 @@
                                                         <label for="payment_block" class="form-label">Payment Block</label>
                                                         <input type="checkbox" class="form-check-input mb-3" id="payment_block" name="payment_block">
                                                         <br>
-                                                        <label for="">Upload File</label>
-                                                        <input name="file" type="file" multiple class="form-control">
+                                                        <!-- File upload section -->
+                                                        <div class="mb-3">
+                                                            <label for="fileInput">Upload Files</label>
+                                                            <input id="fileInput" type="file" name="files[]" class="form-control" multiple> <!-- Correct name attribute -->
+
+                                                            <!-- Add to Basket button -->
+                                                            <button type="button" id="addToBasket" class="btn btn-primary mt-2">Add to Basket</button>
+
+                                                            <!-- Basket of selected files -->
+                                                            <ul class="list-group mt-3" id="fileBasket"></ul>
+                                                        </div>
+
+                                                        <script>
+                                                            let filesInBasket = [];
+
+                                                            document.getElementById('addToBasket').addEventListener('click', function () {
+                                                                const fileInput = document.getElementById('fileInput');
+                                                                const fileBasket = document.getElementById('fileBasket');
+
+                                                                // Loop through the selected files and add them to the basket
+                                                                Array.from(fileInput.files).forEach(file => {
+                                                                    filesInBasket.push(file);
+                                                                    const li = document.createElement('li');
+                                                                    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                                                                    li.innerHTML = `
+                                                                        <span>${file.name}</span>
+                                                                        <button type="button" class="btn btn-danger btn-sm remove-file">Remove</button>
+                                                                    `;
+                                                                    fileBasket.appendChild(li);
+                                                                });
+
+                                                                // Clear the input after adding to the basket
+                                                                fileInput.value = '';
+                                                            });
+
+                                                            // Handle remove file action
+                                                            document.getElementById('fileBasket').addEventListener('click', function (e) {
+                                                                if (e.target.classList.contains('remove-file')) {
+                                                                    const fileItem = e.target.parentElement;
+                                                                    const fileName = fileItem.querySelector('span').textContent;
+
+                                                                    // Remove from the basket array
+                                                                    filesInBasket = filesInBasket.filter(file => file.name !== fileName);
+
+                                                                    // Remove from the DOM
+                                                                    fileItem.remove();
+                                                                }
+                                                            });
+
+                                                            // Handle form submission (append files to file input)
+                                                            document.querySelector('form').addEventListener('submit', function (e) {
+                                                                const fileInput = document.getElementById('fileInput');
+                                                                const dataTransfer = new DataTransfer();
+
+                                                                // Add all files in the basket to the DataTransfer object
+                                                                filesInBasket.forEach(file => {
+                                                                    dataTransfer.items.add(file);
+                                                                });
+
+                                                                // Set the file input's files property to the DataTransfer's files
+                                                                fileInput.files = dataTransfer.files;
+                                                            });
+                                                        </script>
                                                         <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                                     </div>
                                                 </div>
