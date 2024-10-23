@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vendor Form Completed</title>
+    <title>Supplier Form Completed</title>
     <style>
         body {
             font-family: Arial, sans-serif;

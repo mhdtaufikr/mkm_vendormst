@@ -286,7 +286,7 @@ public function update($id)
     // Check if there is an associated vendor change record
     $customerChange = CustomerChange::where('customer_id', $data->id)->first();
     // Check if the level is 8
-    if ($customerChange->level != 8) {
+    if ($customerChange->level != 8 && $customerChange->level != 0) {
         return redirect()->back()->with('failed', 'Data is still under approval and cannot be updated.');
     }
     // Fetch country data from API

@@ -140,7 +140,6 @@ class VendorMstController extends Controller
         usort($countries, function($a, $b) {
             return strcasecmp($a['name']['common'], $b['name']['common']);
         });
-
         // Fetch currencies from API
         $currencyResponse = Http::get('https://openexchangerates.org/api/currencies.json?app_id=YOUR_API_KEY');
         $currencies = $currencyResponse->json();
@@ -322,8 +321,7 @@ public function update($id){
         return redirect()->back()->with('failed', 'No associated vendor change record found.');
     }
 
-    // Check if the level is 8
-    if ($vendorChange->level != 8) {
+    if ($vendorChange->level != 8 && $vendorChange->level != 0) {
         return redirect()->back()->with('failed', 'Data is still under approval and cannot be updated.');
     }
 
@@ -459,10 +457,7 @@ public function storeUpdate(Request $request)
     // Find the existing vendor change record
     $vendorChange = VendorChange::where('vendor_id', $validatedData['id'])->firstOrFail();
 
-    // Check if the level is 8, if not redirect back with a message
-    if ($vendorChange->level != 8) {
-        return redirect()->back()->with('error', 'The data is still under approval and cannot be updated at this moment.');
-    }
+
 
  // Find the existing vendor record
 $vendorMaster = VendorMaster::findOrFail($validatedData['id']);
@@ -547,7 +542,7 @@ $vendorMaster->update(array_merge($validatedData, [
         }
 
     // Redirect or return a response as needed
-    return redirect('/mst/vendor')->with('status', 'Vendor updated successfully and approval process started.');
+    return redirect('/mst/vendor')->with('status', 'Supplier updated successfully and approval process started.');
 }
 
 

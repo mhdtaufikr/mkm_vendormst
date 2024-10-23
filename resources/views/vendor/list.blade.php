@@ -150,9 +150,34 @@
             serverSide: true,
             ajax: "{{ route('mst.vendor') }}",  // Server-side data loading URL
             columns: [
-                { data: 'id', name: 'id' },
-                { data: 'name', name: 'name' },
-                { data: 'vendor_account_number', name: 'vendor_account_number' },
+                {
+                    data: null, // No specific data source for this column
+                    name: 'id',
+                    render: function (data, type, row, meta) {
+                        return meta.row + 1; // Display the row number starting from 1
+                    }
+                },
+                {
+                    data: 'name',
+                    name: 'name',
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Capitalize the first letter of each word
+                            return data.replace(/\w\S*/g, function(txt) {
+                                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                            });
+                        }
+                        return ''; // Return empty string if no data
+                    }
+                },
+                {
+                    data: 'vendor_account_number',
+                    name: 'vendor_account_number',
+                    render: function(data, type, row) {
+                        // Check if the data is null or empty
+                        return data ? data : 'Data still not available';
+                    }
+                },
                 {
                     data: 'approval_route',
                     name: 'approval_route',

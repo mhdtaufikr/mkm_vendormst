@@ -37,7 +37,7 @@ class VendorApprovalMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Approval Required: Vendor Submission')
+        return $this->subject('Approval Required: Supplier Submission')
                     ->view('emails.vendor-approval');
     }
 }

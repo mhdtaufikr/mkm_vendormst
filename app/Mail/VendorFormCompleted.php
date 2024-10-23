@@ -32,7 +32,7 @@ class VendorFormCompleted extends Mailable
      */
     public function build()
     {
-        return $this->subject('Vendor Form Completed')
+        return $this->subject('Supplier Form Completed')
                     ->view('emails.vendor_form_completed')
                     ->attach($this->pdfPath, [
                         'as' => 'vendor_form.pdf',
