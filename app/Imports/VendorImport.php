@@ -25,25 +25,15 @@ class VendorImport implements ToModel, WithHeadingRow
     ];
 
     private $withholdingTaxDescriptions = [
-        "1" => "W/H Tax 23 (2%) Jasa aktuaris;",
-        "2" => "W/H Tax 23 (2%) Jasa akuntansi, pembukuan, dan atestasi laporan keuangan;",
-        "3" => "W/H Tax 23 (2%) Jasa pengolahan limbah, pembasmian hama;",
-        "4" => "W/H Tax 23 (2%) Jasa penyedia tenaga kerja dan atau tenaga ahli (outsourcing services);",
-        "5" => "W/H Tax 23 (2%) Jasa perantara dan atau keagenan, pengurusan dokumen;",
-        "6" => "W/H Tax 23 (2%) Jasa sehubungan dengan software atau hardware atau sistem komputer, internet termasuk sambungannya;",
-        "7" => "W/H Tax 23 (2%) Jasa pemasangan/perawatan mesin, peralatan, listrik, telepon, air, gas, AC, dan atau TV kabel;",
-        "8" => "W/H Tax 23 (2%) Jasa sewa/perawatan kendaraan dan atau alat transportasi darat, laut dan udara;",
-        "9" => "W/H Tax 23 (2%) Jasa maklon;",
-        "10" => "W/H Tax 23 (2%) Jasa kebersihan atau cleaning service, pemeliharaan kolam;",
-        "11" => "W/H Tax 23 (2%) Jasa katering atau tata boga;",
-        "12" => "W/H Tax 23 (2%) Jasa freight forwarding;",
-        "13" => "W/H Tax 23 (2%) Jasa pengepakan, loading dan unloading;",
-        "14" => "W/H Tax 23 (2%) Jasa sertifikasi;",
-        "15" => "W/H Tax 26 (10%) Sewa Tanah / Bangunan;",
-        "16" => "W/H Tax 4 (2%) Jasa Konstruksi dengan KLU Kecil;",
-        "17" => "W/H Tax 4 (3%) Jasa Konstruksi dengan KLU Menengah dan Besar;",
-        "18" => "W/H Tax 4 (4%) Jasa Konstruksi tidak memiliki KLU;"
+        "1" => "W/H Tax 23 (2%) Jasa / Sewa selain Tanah atau Bangunan;",
+        "2" => "W/H Tax 26 (10%) Jasa/Royalty/Deviden;",
+        "3" => "W/H Tax 4-2 (2,65%) Jasa Konstruksi;",
+        "4" => "W/H Tax 4-2 (10%) Sewa Tanah / Bangunan;",
+        "5" => "W/H Tax 21 (5%) Jasa Notaris;",
+        "6" => "Prepaid Tax 23 (2%);",
+        "7" => "Final Tax (10%);"
     ];
+
 
     // Helper function to validate and convert input data to string if it's an integer or float
     private function validateAndConvertToString($data): string
