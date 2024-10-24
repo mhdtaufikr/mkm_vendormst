@@ -52,24 +52,13 @@ class VendorTemplateExport implements WithHeadings, WithEvents
                     // Withholding Tax comments with hardcoded examples
                     'AK1' => "Enter the code from the predefined list below:\n" .
                              "Example values:\n" .
-                             "1 = W/H Tax 23 (2%) Jasa aktuaris;\n" .
-                             "2 = W/H Tax 23 (2%) Jasa akuntansi, pembukuan, dan atestasi laporan keuangan;\n" .
-                             "3 = W/H Tax 23 (2%) Jasa pengolahan limbah, pembasmian hama;\n" .
-                             "4 = W/H Tax 23 (2%) Jasa penyedia tenaga kerja dan atau tenaga ahli (outsourcing services);\n" .
-                             "5 = W/H Tax 23 (2%) Jasa perantara dan atau keagenan, pengurusan dokumen;\n" .
-                             "6 = W/H Tax 23 (2%) Jasa sehubungan dengan software atau hardware atau sistem komputer, internet termasuk sambungannya;\n" .
-                             "7 = W/H Tax 23 (2%) Jasa pemasangan/perawatan mesin, peralatan, listrik, telepon, air, gas, AC, dan atau TV kabel;\n" .
-                             "8 = W/H Tax 23 (2%) Jasa sewa/perawatan kendaraan dan atau alat transportasi darat, laut dan udara;\n" .
-                             "9 = W/H Tax 23 (2%) Jasa maklon;\n" .
-                             "10 = W/H Tax 23 (2%) Jasa kebersihan atau cleaning service, pemeliharaan kolam;\n" .
-                             "11 = W/H Tax 23 (2%) Jasa katering atau tata boga;\n" .
-                             "12 = W/H Tax 23 (2%) Jasa freight forwarding;\n" .
-                             "13 = W/H Tax 23 (2%) Jasa pengepakan, loading dan unloading;\n" .
-                             "14 = W/H Tax 23 (2%) Jasa sertifikasi;\n" .
-                             "15 = W/H Tax 26 (10%) Sewa Tanah / Bangunan;\n" .
-                             "16 = W/H Tax 4 (2%) Jasa Konstruksi dengan KLU Kecil;\n" .
-                             "17 = W/H Tax 4 (3%) Jasa Konstruksi dengan KLU Menengah dan Besar;\n" .
-                             "18 = W/H Tax 4 (4%) Jasa Konstruksi tidak memiliki KLU;\n"
+                             "1 = W/H Tax 23 (2%) Jasa / Sewa selain Tanah atau Bangunan;\n" .
+                             "2 = W/H Tax 26 (10%) Jasa/Royalty/Deviden;\n" .
+                             "3 = W/H Tax 4-2 (2,65%) Jasa Konstruksi;\n" .
+                             "4 = W/H Tax 4-2 (10%) Sewa Tanah / Bangunan;\n" .
+                             "5 = W/H Tax 21 (5%) Jasa Notaris;\n" .
+                             "6 = Prepaid Tax 23 (2%);\n" .
+                             "7 = Final Tax (10%);\n"
                 ];
 
                 // Apply comments to the respective cells with larger size and text formatting
