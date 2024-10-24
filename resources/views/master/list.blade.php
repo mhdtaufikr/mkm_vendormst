@@ -210,52 +210,61 @@
 
                                     </div>
                                 </div>
-                                 <!-- Customer Log Modal -->
-                                 <div class="modal fade" id="modal-log{{ $data->id }}" tabindex="-1" aria-labelledby="modal-logLabel{{ $data->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="modal-logLabel{{ $data->id }}">Customer Log</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <!-- Display the log here -->
-                                                <table id="tableLog{{ $data->id }}" class="table table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Approver</th>
-                                                            <th>Action</th>
-                                                            <th>Comments</th>
-                                                            <th>Timestamp</th>
-                                                            <th>Level</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($data->changes as $change)
-                                                            @foreach($change->approvalLogs as $log)
-                                                                <tr class="
-                                                                @if($log->approval_action === 'checked')
-                                                                    table-success
-                                                                @elseif($log->approval_action === 'remand')
-                                                                    table-danger
-                                                                @elseif($log->approval_action === 'Submitter')
-                                                                    table-primary
-                                                                @endif
-                                                            ">
-                                                                    <td>{{ $log->approver->name ?? 'No approver' }}</td>
-                                                                    <td>{{ $log->approval_action }}</td>
-                                                                    <td>{{ $log->approval_comments }}</td>
-                                                                    <td>{{ $log->approval_timestamp }}</td>
-                                                                    <td>{{ $log->approval_level }}</td>
-                                                                </tr>
-                                                            @endforeach
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <!-- Customer Log Modal -->
+@if(isset($data) && $data->id)
+<div class="modal fade" id="modal-log{{ $data->id }}" tabindex="-1" aria-labelledby="modal-logLabel{{ $data->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-logLabel{{ $data->id }}">Customer Log</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Display the log here -->
+                <table id="tableLog{{ $data->id }}" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Approver</th>
+                            <th>Action</th>
+                            <th>Comments</th>
+                            <th>Timestamp</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(isset($data->changes) && count($data->changes) > 0)
+                            @foreach($data->changes as $change)
+                                @foreach($change->approvalLogs as $log)
+                                    <tr class="
+                                        @if($log->approval_action === 'checked')
+                                            table-success
+                                        @elseif($log->approval_action === 'remand')
+                                            table-danger
+                                        @elseif($log->approval_action === 'Submitter')
+                                            table-primary
+                                        @endif
+                                    ">
+                                        <td>{{ $log->approver->name ?? 'No approver' }}</td>
+                                        <td>{{ $log->approval_action }}</td>
+                                        <td>{{ $log->approval_comments }}</td>
+                                        <td>{{ $log->approval_timestamp }}</td>
+                                        <td>{{ $log->approval_level }}</td>
+                                    </tr>
+                                @endforeach
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="5">No logs available.</td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
                                 <!-- End Customer Log Modal -->
                                 <!-- /.card-body -->
                             </div>

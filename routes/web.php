@@ -46,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     //Customer Master
-    Route::get('/mst/customer', [CustomerMstController::class, 'index']);
+    Route::get('/mst/customer', [CustomerMstController::class, 'index'])->name('mst.customer');
     Route::get('/mst/customer/form', [CustomerMstController::class, 'form']);
     Route::post('/customer/store', [CustomerMstController::class, 'store']);
     Route::get('/customer/checked/{id}', [CustomerMstController::class, 'checked']);
