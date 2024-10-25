@@ -27,6 +27,9 @@ Route::post('/auth/login', [AuthController::class, 'postLogin']);
 Route::get('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth'])->group(function () {
+
+// Handle password change
+Route::post('/change-password', [AuthController::class, 'changePassword'])->name('changePassword');
     //Home Controller
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 

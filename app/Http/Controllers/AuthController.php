@@ -5,10 +5,33 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Hash; // Add this line
 
 class AuthController extends Controller
 {
+      // Handle Change Password Logic
+      public function changePassword(Request $request)
+      {
+          // Validate the request
+          $request->validate([
+              'old_password' => 'required',
+              'new_password' => 'required|min:8|confirmed',
+          ]);
+
+          // Check if the old password is correct
+          if (!Hash::check($request->old_password, Auth::user()->password)) {
+              return back()->withErrors(['old_password' => 'Old password is incorrect']);
+          }
+
+          // Update the user's password
+          Auth::user()->update([
+              'password' => Hash::make($request->new_password),
+          ]);
+
+          // Return a success message
+          return back()->with('password', 'Password changed successfully');
+      }
+
     public function login(){
         return view('auth.login');
     }
