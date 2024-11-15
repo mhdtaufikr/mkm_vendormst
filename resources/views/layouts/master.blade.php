@@ -88,37 +88,69 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src={{asset('assets/js/scripts.js')}} ></script>
 <!-- Change Password Modal -->
-<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ route('changePassword') }}">
+            @csrf
+            <div class="modal-body">
+                <div class="mb-3">
+                <label for="oldPassword" class="form-label">Old Password</label>
+                <input type="password" class="form-control" id="oldPassword" name="old_password" required>
+                </div>
+                <div class="mb-3">
+                <label for="newPassword" class="form-label">New Password</label>
+                <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                </div>
+                <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                <input type="password" class="form-control" id="confirmPassword" name="new_password_confirmation" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Change Password</button>
+            </div>
+            </form>
         </div>
-        <form method="POST" action="{{ route('changePassword') }}">
-          @csrf
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="oldPassword" class="form-label">Old Password</label>
-              <input type="password" class="form-control" id="oldPassword" name="old_password" required>
-            </div>
-            <div class="mb-3">
-              <label for="newPassword" class="form-label">New Password</label>
-              <input type="password" class="form-control" id="newPassword" name="new_password" required>
-            </div>
-            <div class="mb-3">
-              <label for="confirmPassword" class="form-label">Confirm New Password</label>
-              <input type="password" class="form-control" id="confirmPassword" name="new_password_confirmation" required>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Change Password</button>
-          </div>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
+    <!-- Loader Spinner -->
+    <div id="loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <style>
+        #loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("loader").style.display = "none"; // Hide loader once content is ready
 
+            // Show loader on AJAX start
+            $(document).on("ajaxStart", function () {
+                document.getElementById("loader").style.display = "flex";
+            });
+
+            // Hide loader on AJAX stop
+            $(document).on("ajaxStop", function () {
+                document.getElementById("loader").style.display = "none";
+            });
+        });
+
+        // Show loader when navigating away from the page
+        window.addEventListener("beforeunload", function () {
+            document.getElementById("loader").style.display = "flex";
+        });
+    </script>
     </body>
 </html>

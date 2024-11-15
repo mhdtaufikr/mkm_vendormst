@@ -35,78 +35,92 @@ class VendorMstController extends Controller
             ->orderBy('created_at', 'desc');
 
         return DataTables::eloquent($items)
-            ->addColumn('approval_route', function($data) {
-                // Fetch all users to map id to name
-                $users = User::select('id', 'username')->get()->pluck('username', 'id');
+        ->addColumn('approval_route', function($data) {
+            // Fetch all users to map id to name and dept
+            $users = User::select('id', 'username', 'dept')->get()->keyBy('id'); // Map users by ID for quick lookup
 
-                // Fetch distinct approval routes based on level
-                $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
-                    ->orderBy('level', 'asc') // Order by level to maintain separation of levels within the same department
-                    ->get();
+            // Fetch distinct approval routes based on level and department
+            $approvalRoutes = ApprovalRoute::select('level', 'dept', 'name', 'action', 'requester')
+                ->orderBy('level', 'asc') // Order by level to maintain separation of levels within the same department
+                ->get();
 
-                foreach ($data->vendorChanges as $change) {
-                    // Get the name of the creator using the created_by id from the vendor changes
-                    $createdByName = $users->get($change->created_by);
+            foreach ($data->vendorChanges as $change) {
+                // Get the creator's name and department using the created_by id from the vendor changes
+                $createdBy = $users->get($change->created_by);
+                $createdByName = $createdBy->username ?? null;
+                $createdByDept = $createdBy->dept ?? null;
 
-                    // Filter approval routes based on the mapped name from the users table
-                    $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName) {
+                // Filter approval routes
+                $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName, $createdByDept) {
+                    // For Levels 3 to 7, ignore the department
+                    if ($route->level >= 3 && $route->level <= 7) {
                         return $route->requester === $createdByName || is_null($route->requester);
-                    });
-
-                    $currentLevel = $change->level;
-
-                    // Add status and timestamp to each distinct route in the filtered approval routes
-                    foreach ($filteredRoutes as $route) {
-                        $approvalLog = $change->logs->firstWhere('approver.name', $route->name);
-
-                        if ($route->level < $currentLevel) {
-                            $route->status = 'Approved';
-                            $route->timestamp = $approvalLog ? $approvalLog->approval_timestamp : null;
-                        } elseif ($route->level == $currentLevel) {
-                            if ($approvalLog && $approvalLog->approval_action === 'Approved') {
-                                $route->status = 'Approved';
-                                $route->timestamp = $approvalLog->approval_timestamp;
-                            } else {
-                                $route->status = 'Pending';
-                                $route->timestamp = null;
-                            }
-                        } else {
-                            $route->status = 'Not yet reviewed';
-                            $route->timestamp = null;
-                        }
                     }
 
-                    // Group routes by department and separate lines for different levels within the same department
-                    $groupedRoutes = $filteredRoutes->groupBy(function($route) {
-                        return $route->dept . '-' . $route->level; // Separate by both department and level for internal grouping
-                    });
+                    // For other levels, filter by both dept and requester
+                    return ($route->dept === $createdByDept) &&
+                           ($route->requester === $createdByName || is_null($route->requester));
+                });
 
-                    $change->groupedApprovalRoutes = $groupedRoutes->map(function ($routes) {
-                        // Apply color based on status
-                        return $routes->map(function($route) {
-                            // Use if-else instead of match for compatibility with older PHP versions
-                            if ($route->status === 'Approved') {
-                                $colorClass = 'text-success'; // Green
-                            } elseif ($route->status === 'Pending') {
-                                $colorClass = 'text-warning'; // Orange
-                            } else {
-                                $colorClass = 'text-muted'; // Grey for "Not yet reviewed"
-                            }
+                $currentLevel = $change->level;
 
-                            // Return name with color class applied
-                            return "<span class=\"{$colorClass}\">{$route->name} - ({$route->status})</span>";
-                        })->implode(' , ');
-                    });
+                // Add status and timestamp to each distinct route in the filtered approval routes
+                foreach ($filteredRoutes as $route) {
+                    $approvalLog = $change->logs->firstWhere('approver.name', $route->name);
 
-
-                    // Determine all pending approvers for the current level
-                    $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
-                    $change->latestPending = !empty($pendingApprovers) ? implode(' & ', $pendingApprovers) : 'Approved';
+                    if ($route->level < $currentLevel) {
+                        $route->status = 'Approved';
+                        $route->timestamp = $approvalLog ? $approvalLog->approval_timestamp : null;
+                    } elseif ($route->level == $currentLevel) {
+                        if ($approvalLog && $approvalLog->approval_action === 'Approved') {
+                            $route->status = 'Approved';
+                            $route->timestamp = $approvalLog->approval_timestamp;
+                        } else {
+                            $route->status = 'Pending';
+                            $route->timestamp = null;
+                        }
+                    } else {
+                        $route->status = 'Not yet reviewed';
+                        $route->timestamp = null;
+                    }
                 }
 
-                // Render the HTML content for approval routes using the view
-                return view('vendor.partials.approval_route', compact('data'))->render();
-            })
+                // Group routes by department and level
+                $groupedRoutes = $filteredRoutes->groupBy(function($route) {
+                    // For Levels 3 to 7, group by level only
+                    if ($route->level >= 3 && $route->level <= 7) {
+                        return $route->dept . '-' . $route->level;
+                    }
+
+                    // For other levels, group by department and level
+                    return $route->dept . '-' . $route->level;
+                });
+
+                $change->groupedApprovalRoutes = $groupedRoutes->map(function ($routes) {
+                    // Apply color based on status
+                    return $routes->map(function($route) {
+                        if ($route->status === 'Approved') {
+                            $colorClass = 'text-success'; // Green
+                        } elseif ($route->status === 'Pending') {
+                            $colorClass = 'text-warning'; // Orange
+                        } else {
+                            $colorClass = 'text-muted'; // Grey for "Not yet reviewed"
+                        }
+
+                        // Return name with color class applied
+                        return "<span class=\"{$colorClass}\">{$route->name} - ({$route->status})</span>";
+                    })->implode(' , ');
+                });
+
+                // Determine all pending approvers for the current level
+                $pendingApprovers = $filteredRoutes->where('status', 'Pending')->pluck('name')->toArray();
+                $change->latestPending = !empty($pendingApprovers) ? implode(' & ', $pendingApprovers) : 'Approved';
+            }
+
+            // Render the HTML content for approval routes using the view
+            return view('vendor.partials.approval_route', compact('data'))->render();
+        })
+
             ->addColumn('action', function($data) {
                 return view('vendor.partials.actions', compact('data'))->render();
             })
