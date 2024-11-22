@@ -53,7 +53,7 @@ class VendorMstController extends Controller
                 // Filter approval routes
                 $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName, $createdByDept) {
                     // For Levels 3 to 7, ignore the department
-                    if ($route->level >= 3 && $route->level <= 7) {
+                    if ($route->level >= 3 && $route->level <= 8) {
                         return $route->requester === $createdByName || is_null($route->requester);
                     }
 
@@ -88,7 +88,7 @@ class VendorMstController extends Controller
                 // Group routes by department and level
                 $groupedRoutes = $filteredRoutes->groupBy(function($route) {
                     // For Levels 3 to 7, group by level only
-                    if ($route->level >= 3 && $route->level <= 7) {
+                    if ($route->level >= 3 && $route->level <= 8) {
                         return $route->dept . '-' . $route->level;
                     }
 
@@ -335,9 +335,10 @@ public function update($id){
         return redirect()->back()->with('failed', 'No associated vendor change record found.');
     }
 
-    if ($vendorChange->level != 8 && $vendorChange->level != 0) {
-        return redirect()->back()->with('failed', 'Data is still under approval and cannot be updated.');
+    if (($vendorChange->level != 9 && $vendorChange->level != 0) || auth()->user()->level != 0) {
+        return redirect()->back()->with('failed', 'Data is still under approval, or you do not have access to update this form.');
     }
+
 
 
     // Sort countries alphabetically by name
@@ -733,7 +734,7 @@ public function approval(Request $request)
         }
     } else {
         // If the next level is 8, mark as completed and notify
-        if ($nextApprovalLevel == 8) {
+        if ($nextApprovalLevel == 9) {
             // Mark as completed
             $vendorChange->status = 'completed';
             $vendorChange->save();

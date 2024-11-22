@@ -194,7 +194,7 @@
                                             <!-- Master Section -->
                                             <div class="col-md-6 mb-3">
                                                 <label for="customer_account_number" class="form-label">Customer Account Number</label>
-                                                <input value="{{ $data->customer_account_number }}" type="text" class="form-control" id="customer_account_number" name="customer_account_number" required @if(Auth::user()->level != 5) readonly @endif>
+                                                <input value="{{ $data->customer_account_number }}" type="text" class="form-control" id="customer_account_number" name="customer_account_number" required @if(Auth::user()->level != 6) readonly @endif>
                                                 <small class="text-danger form-text">(Enter customer account number only for customer employee and customer inter company)</small>
                                             </div>
                                         </form>

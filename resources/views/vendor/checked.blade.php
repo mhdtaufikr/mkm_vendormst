@@ -197,11 +197,11 @@
                                                 <input
                                                     value="{{ $data->vendor_account_number }}"
                                                     type="text"
-                                                    class="form-control @if(Auth::user()->level == 5) required @endif"
+                                                    class="form-control @if(Auth::user()->level == 6) required @endif"
                                                     id="vendor_account_number"
                                                     name="vendor_account_number"
-                                                    @if(Auth::user()->level != 5) readonly @endif
-                                                    @if(Auth::user()->level == 5) required @endif
+                                                    @if(Auth::user()->level != 6) readonly @endif
+                                                    @if(Auth::user()->level == 6) required @endif
                                                 >
                                                 <small class="text-danger form-text">(Enter Supplier account number only for Supplier employee and Supplier inter company)</small>
                                             </div>
