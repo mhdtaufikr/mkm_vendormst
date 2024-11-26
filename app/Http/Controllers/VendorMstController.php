@@ -147,7 +147,7 @@ class VendorMstController extends Controller
         $types = Dropdown::where('category', 'Type')->get();
         $tax = Dropdown::where('category', 'Withholding Tax')->get();
         $title = Dropdown::where('category', 'Title')->get();
-        $response = Http::get('https://restcountries.com/v3.1/all');
+        $response = Http::get('https://restcountries.com/v3.1/region/asia');
         $countries = $response->json();
 
         // Sort countries alphabetically by name
@@ -321,7 +321,7 @@ public function update($id){
     $types = Dropdown::where('category', 'Type')->get();
     $tax = Dropdown::where('category', 'Withholding Tax')->get();
     $title = Dropdown::where('category', 'Title')->get();
-    $response = Http::get('https://restcountries.com/v3.1/all');
+    $response = Http::get('https://restcountries.com/v3.1/region/asia');
     $countries = $response->json();
     $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
     // Find the vendor master record
@@ -374,7 +374,7 @@ public function update($id){
     $types = Dropdown::where('category', 'Type')->get();
     $tax = Dropdown::where('category', 'Withholding Tax')->get();
     $title = Dropdown::where('category', 'Title')->get();
-    $response = Http::get('https://restcountries.com/v3.1/all');
+    $response = Http::get('https://restcountries.com/v3.1/region/asia');
     $countries = $response->json();
     $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
 
@@ -571,7 +571,7 @@ public function checked($id)
     $types = Dropdown::where('category', 'Type')->get();
     $tax = Dropdown::where('category', 'Withholding Tax')->get();
     $title = Dropdown::where('category', 'Title')->get();
-    $response = Http::get('https://restcountries.com/v3.1/all');
+    $response = Http::get('https://restcountries.com/v3.1/region/asia');
     $countries = $response->json();
     $data = VendorMaster::with(['latestChange', 'latestChange.logs.approver'])->where('id', $id)->first();
 
