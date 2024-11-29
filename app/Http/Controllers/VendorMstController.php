@@ -32,7 +32,7 @@ class VendorMstController extends Controller
 {
     if ($request->ajax()) {
         $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('updated_at', 'desc');
 
         return DataTables::eloquent($items)
         ->addColumn('approval_route', function($data) {
