@@ -120,6 +120,7 @@
                                                     <th>Supplier Name</th>
                                                     <th>Supplier Account Number</th>
                                                     <th>Approval Route</th>
+                                                    <th>Type</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -186,6 +187,13 @@
                     render: function(data, type, row) {
                         // Return the HTML content directly for rendering
                         return data;
+                    }
+                },
+                {
+                    data: 'change_type',
+                    name: 'change_type',
+                    render: function(data) {
+                        return data ? data : 'No changes';
                     }
                 },
                 {

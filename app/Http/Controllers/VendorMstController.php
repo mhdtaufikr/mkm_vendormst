@@ -35,6 +35,10 @@ class VendorMstController extends Controller
             ->orderBy('updated_at', 'desc');
 
         return DataTables::eloquent($items)
+        ->addColumn('change_type', function ($data) {
+            // Concatenate or process `change_type` values if needed
+            return $data->vendorChanges->pluck('change_type')->join(', ');
+        })
         ->addColumn('approval_route', function($data) {
             // Fetch all users to map id to name and dept
             $users = User::select('id', 'username', 'dept')->get()->keyBy('id'); // Map users by ID for quick lookup
