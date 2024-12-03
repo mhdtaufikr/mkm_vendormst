@@ -24,83 +24,86 @@
                             <div class="card mb-4">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h3 class="card-title m-0">Supplier Master Form</h3>
-                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#actionModal">
-                                        Approve
-                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <!-- Buttons -->
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#remandModal">
+                                            Remand
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                                            Approve
+                                        </button>
+
+                                    </div>
                                 </div>
-                              <!-- Modal -->
-<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="actionModalLabel">Select Action</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Modal form -->
-                <form action="{{url('vendor/approval')}}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <input hidden type="text" name="id" value="{{$data->id}}">
-                        <label class="form-label">Action</label><br>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="action" id="action_checked" value="checked" {{$data->action == 'checked' ? 'checked' : ''}}>
-                            <label class="form-check-label" for="action_checked">Checked</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="action" id="action_remand" value="remand" {{$data->action == 'remand' ? 'checked' : ''}}>
-                            <label class="form-check-label" for="action_remand">Remand</label>
-                        </div>
-                    </div>
 
-                    <!-- Dropdown for selecting approver to remand -->
-                    <div class="mb-3" id="remand-to-container" style="display:none;">
-                        <label for="remand_to" class="form-label">Remand To</label>
-                        <select class="form-control" id="remand_to" name="remand_to">
-                            @php
-                                $approvers = $data->latestChange->logs->unique('approver_id')->filter(function ($log) use ($currentUserLevel) {
-                                    return $log->approver->level < $currentUserLevel;
-                                });
-                            @endphp
-                            @foreach($approvers as $log)
-                                <option value="{{ $log->approver_id }}">{{ $log->approver->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="remarks" class="form-label">Remarks</label>
-                        <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Approve</button>
-                    </div>
+                                <!-- Approve Modal -->
+                                <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="approveModalLabel">Approve Action</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form action="{{url('vendor/approval')}}" method="POST">
+                                                @csrf
+                                                <div class="modal-body">
+                                                    <input hidden type="text" name="id" value="{{$data->id}}">
+                                                    <input hidden type="text" name="action" value="checked">
+                                                    <p>Are you sure you want to approve this item?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-success">Approve</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
 
-            </div>
-        </div>
-    </div>
-</div>
+                                <!-- Remand Modal -->
+                                <div class="modal fade" id="remandModal" tabindex="-1" aria-labelledby="remandModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="remandModalLabel">Remand Action</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form action="{{url('vendor/approval')}}" method="POST">
+                                                @csrf
+                                                <div class="modal-body">
+                                                    <input hidden type="text" name="id" value="{{$data->id}}">
+                                                    <input hidden type="text" name="action" value="remand">
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const actionRemand = document.getElementById('action_remand');
-        const remandToContainer = document.getElementById('remand-to-container');
+                                                    <!-- Dropdown for selecting approver to remand -->
+                                                    <div class="mb-3">
+                                                        <label for="remand_to" class="form-label">Remand To</label>
+                                                        <select class="form-control" id="remand_to" name="remand_to">
+                                                            @php
+                                                                $approvers = $data->latestChange->logs->unique('approver_id')->filter(function ($log) use ($currentUserLevel) {
+                                                                    return $log->approver->level < $currentUserLevel;
+                                                                });
+                                                            @endphp
+                                                            @foreach($approvers as $log)
+                                                                <option value="{{ $log->approver_id }}">{{ $log->approver->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
 
-        actionRemand.addEventListener('change', function() {
-            if (this.checked) {
-                remandToContainer.style.display = 'block';
-            }
-        });
+                                                    <div class="mb-3">
+                                                        <label for="remarks" class="form-label">Remarks</label>
+                                                        <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-danger">Remand</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
 
-        const actionChecked = document.getElementById('action_checked');
-        actionChecked.addEventListener('change', function() {
-            if (this.checked) {
-                remandToContainer.style.display = 'none';
-            }
-        });
-    });
-</script>
 
                                 <!-- /.card-header -->
                                 <div class="card-body">
