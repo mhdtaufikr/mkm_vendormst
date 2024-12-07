@@ -24,10 +24,13 @@
         }
 
         .container-fluid {
-            display: flex;
-            height: 100%;
-            width: 100vw;
-        }
+    display: flex;
+    height: 100%;
+    width: 100%;
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
 
         .picture-section {
             flex: 6;
