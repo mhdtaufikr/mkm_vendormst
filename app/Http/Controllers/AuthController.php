@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash; // Add this line
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -36,20 +37,51 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function handleAzureCallback(Request $request)
+    {
+        return Socialite::driver('azure')->redirect();
+    }
+
     public function postLogin(Request $request)
     {
-        $usernameOrEmail = $request->input('email');
-        $password = $request->input('password');
-        // Determine if input is likely an email address
-        $isEmail = filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL);
+        if ($request->has('code') && $request->has('state')) {
+            try {
+                // Retrieve the user details from Azure AD
+                $azureUser = Socialite::driver('azure')->stateless()->user();
 
-        // Define the credentials array based on input type
-        if ($isEmail) {
-            $credentials = ['email' => $usernameOrEmail];
-        } else {
-            $credentials = ['username' => $usernameOrEmail];
+                // Check if the user already exists in the database
+                $user = User::where('email', $azureUser->mail)->first();
+
+                if ($user) {
+                    // Log the user in automatically
+                    Auth::login($user);
+
+                    // Update last login and login counter
+                    $user->update([
+                        'last_login' => now(),
+                        'login_counter' => $user->login_counter + 1,
+                    ]);
+
+                    // Redirect to intended URL or home
+                    return redirect()->intended('/home');
+                } else {
+                    // User not found
+                    return redirect('/')->with('statusLogin', 'User not found. Please contact the administrator.');
+                }
+            } catch (\Exception $e) {
+                // Handle Azure login exceptions
+                return redirect('/')->with('statusLogin', 'Azure Login Failed: ' . $e->getMessage());
+            }
         }
 
+        $emailOrName = $request->input('email');
+        $password = $request->input('password');
+
+        // Determine if input is an email address or a name
+        $isEmail = filter_var($emailOrName, FILTER_VALIDATE_EMAIL);
+
+        // Define credentials based on input type
+        $credentials = $isEmail ? ['email' => $emailOrName] : ['username' => $emailOrName];
         $credentials['password'] = $password;
 
         // Attempt authentication
@@ -57,24 +89,23 @@ class AuthController extends Controller
             // Authentication successful
             $user = Auth::user();
 
-            // Check user status
+            // Check if the user is active
             if ($user->is_active == '1') {
-                // Update last login
-                User::where('id', $user->id)
-                    ->update([
-                        'last_login' => now(),
-                        'login_counter' => $user->login_counter + 1,
-                    ]);
+                // Update last login and login counter
+                User::where('id', $user->id)->update([
+                    'last_login' => now(),
+                    'login_counter' => $user->login_counter + 1,
+                ]);
 
-                // Redirect to the intended URL or to home page
-                return redirect()->intended('/home');
+                // Redirect to /home
+                return redirect('/home');
             } else {
-                // User is not active, redirect with message
+                // User is not active, redirect with a status message
                 return redirect('/')->with('statusLogin', 'Give Access First to User');
             }
         } else {
-            // Authentication failed, redirect with message
-            return redirect('/')->with('statusLogin', 'Wrong Username/Email or Password');
+            // Authentication failed, redirect with a status message
+            return redirect('/')->with('statusLogin', 'Wrong Email/Name or Password');
         }
     }
 

@@ -23,7 +23,8 @@ use App\Http\Controllers\CustomerMstController;
 */
 
 Route::get('/', [AuthController::class, 'login'])->name('login');
-Route::post('/auth/login', [AuthController::class, 'postLogin']);
+Route::any('/auth/login', [AuthController::class, 'postLogin']);
+Route::get('auth/microsoft', [AuthController::class, 'handleAzureCallback'])->name('login.azzure');
 Route::get('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth'])->group(function () {

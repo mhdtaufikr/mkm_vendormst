@@ -11,8 +11,11 @@
         "guzzlehttp/guzzle": "^7.8",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
+        "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
+        "socialiteproviders/microsoft": "^4.5",
+        "socialiteproviders/microsoft-azure": "^5.2",
         "yajra/laravel-datatables-oracle": "9.19.2"
     },
     "require-dev": {
