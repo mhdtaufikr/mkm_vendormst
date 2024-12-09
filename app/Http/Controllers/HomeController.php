@@ -51,8 +51,7 @@ class HomeController extends Controller
             $query->whereIn('created_by', function ($subquery) use ($userDept) {
                 // Fetch department from users based on who created the vendor change
                 $subquery->select('id')
-                    ->from('users')
-                    ->where('dept', $userDept); // Match creator's department
+                    ->from('users'); // Match creator's department
             });
         });
 
@@ -60,8 +59,7 @@ class HomeController extends Controller
         $customerPendingList->whereHas('customer', function ($query) use ($userDept) {
             $query->whereIn('created_by', function ($subquery) use ($userDept) {
                 $subquery->select('id')
-                    ->from('users')
-                    ->where('dept', $userDept);
+                    ->from('users');
             });
         });
     } elseif ($userLevel > 2) {

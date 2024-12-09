@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\VendorImport;
 use Yajra\DataTables\Facades\DataTables;
+use DB;
 
 
 class VendorMstController extends Controller
@@ -54,17 +55,22 @@ class VendorMstController extends Controller
                 $createdByName = $createdBy->username ?? null;
                 $createdByDept = $createdBy->dept ?? null;
 
-                // Filter approval routes
                 $filteredRoutes = $approvalRoutes->filter(function($route) use ($createdByName, $createdByDept) {
-                    // For Levels 3 to 7, ignore the department
-                    if ($route->level >= 3 && $route->level <= 8) {
+                    // For Level 1 and 3, filter by both dept and requester
+                    if ($route->level === 1 || $route->level === 3) {
+                        return ($route->dept === $createdByDept) &&
+                               ($route->requester === $createdByName || is_null($route->requester));
+                    }
+
+                    // For Levels 2 to 10 (excluding 1 and 3), ignore the department
+                    if ($route->level >= 2 && $route->level <= 10) {
                         return $route->requester === $createdByName || is_null($route->requester);
                     }
 
-                    // For other levels, filter by both dept and requester
-                    return ($route->dept === $createdByDept) &&
-                           ($route->requester === $createdByName || is_null($route->requester));
+                    // Default case (if needed)
+                    return false;
                 });
+
 
                 $currentLevel = $change->level;
 
@@ -625,6 +631,7 @@ public function approval(Request $request)
         'remand_to' => 'nullable|integer|exists:users,id' // Validate remand_to if present
     ]);
 
+
     // Get the authenticated user's ID and level
     $approverId = Auth::id();
     $levelUser = Auth::user()->level;
@@ -676,12 +683,14 @@ public function approval(Request $request)
     $userDept = Auth::user()->dept; // User department should be based on the submitter, not the approver
     $userName = Auth::user()->username;
 
-    // Determine the next approval route
-    if ($vendorChange->level < 1) {
+   // Determine the next approval route
+     if ($vendorChange->level < 1) {
         $approvalRoute = ApprovalRoute::where('dept', $userDept)
             ->where('requester', $userName)
             ->where('level', $nextApprovalLevel)->get();
     } elseif ($vendorChange->level < 2) {
+        $approvalRoute = ApprovalRoute::where('level', $nextApprovalLevel)->get();
+    } elseif ($vendorChange->level < 3) {
         $approvalRoute = ApprovalRoute::where('dept', $userDept)
             ->where('level', $nextApprovalLevel)->get();
     } else {
@@ -738,13 +747,13 @@ public function approval(Request $request)
         }
     } else {
         // If the next level is 8, mark as completed and notify
-        if ($nextApprovalLevel == 9) {
+        if ($nextApprovalLevel == 11) {
             // Mark as completed
             $vendorChange->status = 'completed';
             $vendorChange->save();
 
             // Notify level 7 user and the submitter
-            /* $this->notifyCompletion($vendorChange, $vendorMaster, $userDept, $userName); */
+            $this->notifyCompletion($vendorChange, $vendorMaster, $userDept, $userName);
 
             // Generate and send PDF
             $this->generateAndSendPDF($vendorChange, $vendorMaster, $userDept, $userName);
@@ -773,13 +782,15 @@ public function approval(Request $request)
         }
         return redirect()->back()->with('status', 'Approval processed successfully.');
     }
+
+
 }
 
 
 
         private function notifyCompletion($vendorChange, $vendorMaster, $userDept, $userName) {
                 // Fetch level 7 users
-                $level7Users = User::where('level', 7)->get();
+                $level7Users = User::where('level', 10)->get();
                 $submitter = User::find($vendorChange->created_by);
 
                 foreach ($level7Users as $user) {

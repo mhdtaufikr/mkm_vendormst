@@ -104,6 +104,42 @@
                                     </div>
                                 </div>
 
+                                <script>
+                                   document.addEventListener('DOMContentLoaded', function () {
+                                        // Approve Modal Validation
+                                        const approveModal = document.getElementById('approveModal');
+                                        const approveForm = approveModal.querySelector('form');
+                                        const vendorAccountNumber = document.getElementById('vendor_account_number');
+
+                                        approveForm.addEventListener('submit', function (event) {
+                                            // Tambahkan kondisi untuk validasi hanya jika level pengguna adalah 7
+                                            const userLevel = {{ Auth::user()->level }}; // Mendapatkan level pengguna dari server-side
+                                            if (userLevel === 7 && vendorAccountNumber && !vendorAccountNumber.value.trim()) {
+                                                event.preventDefault(); // Prevent form submission
+                                                alert('Supplier Account Number is required for approval!');
+                                            }
+                                        });
+
+                                        // Remand Modal Validation
+                                        const remandModal = document.getElementById('remandModal');
+                                        const remandForm = remandModal.querySelector('form');
+                                        const remandTo = remandModal.querySelector('#remand_to');
+                                        const remarks = remandModal.querySelector('#remarks');
+
+                                        remandForm.addEventListener('submit', function (event) {
+                                            if (remandTo && !remandTo.value.trim()) {
+                                                event.preventDefault(); // Prevent form submission
+                                                alert('Please select a person to remand to!');
+                                                return;
+                                            }
+
+                                            if (remarks && !remarks.value.trim()) {
+                                                event.preventDefault(); // Prevent form submission
+                                                alert('Please provide remarks for the remand!');
+                                            }
+                                        });
+                                    });
+                                </script>
 
                                 <!-- /.card-header -->
                                 <div class="card-body">
@@ -200,16 +236,14 @@
                                                 <input
                                                     value="{{ $data->vendor_account_number }}"
                                                     type="text"
-                                                    class="form-control @if(Auth::user()->level == 6) required @endif"
+                                                    class="form-control @if(Auth::user()->level == 7) required @endif"
                                                     id="vendor_account_number"
                                                     name="vendor_account_number"
-                                                    @if(Auth::user()->level != 6) readonly @endif
-                                                    @if(Auth::user()->level == 6) required @endif
+                                                    @if(Auth::user()->level != 7) readonly @endif
+                                                    @if(Auth::user()->level == 7) required @endif
                                                 >
                                                 <small class="text-danger form-text">(Enter Supplier account number only for Supplier employee and Supplier inter company)</small>
                                             </div>
-
-                                        </form>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Change Type</label><br>
                                                 @foreach($types as $type)
