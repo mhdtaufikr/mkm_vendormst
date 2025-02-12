@@ -45,11 +45,12 @@
                                                 <h5 class="modal-title" id="approveModalLabel">Approve Action</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <form action="{{url('vendor/approval')}}" method="POST">
+                                            <form action="{{ url('vendor/approval') }}" method="POST">
                                                 @csrf
                                                 <div class="modal-body">
-                                                    <input hidden type="text" name="id" value="{{$data->id}}">
+                                                    <input hidden type="text" name="id" value="{{ $data->id }}">
                                                     <input hidden type="text" name="action" value="checked">
+                                                    <input hidden type="text" id="hidden_vendor_account_number" name="vendor_account_number">
                                                     <p>Are you sure you want to approve this item?</p>
                                                 </div>
                                                 <div class="modal-footer">
@@ -60,6 +61,19 @@
                                         </div>
                                     </div>
                                 </div>
+                                <script>
+                                    document.getElementById('approveModal').addEventListener('show.bs.modal', function () {
+                                        var accountNumber = document.getElementById('vendor_account_number').value;
+                                        document.getElementById('hidden_vendor_account_number').value = accountNumber;
+                                    });
+
+                                    // Opsi lain, saat tombol submit diklik
+                                    document.querySelector('[type="submit"]').addEventListener('click', function () {
+                                        var accountNumber = document.getElementById('vendor_account_number').value;
+                                        document.getElementById('hidden_vendor_account_number').value = accountNumber;
+                                    });
+                                    </script>
+
 
                                 <!-- Remand Modal -->
                                 <div class="modal fade" id="remandModal" tabindex="-1" aria-labelledby="remandModalLabel" aria-hidden="true">

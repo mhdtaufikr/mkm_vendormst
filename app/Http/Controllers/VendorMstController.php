@@ -345,7 +345,7 @@ public function update($id){
         return redirect()->back()->with('failed', 'No associated vendor change record found.');
     }
 
-    if (($vendorChange->level != 9 && $vendorChange->level != 0) || auth()->user()->level != 0) {
+    if (($vendorChange->level != 11 && $vendorChange->level != 0) || auth()->user()->level != 0) {
         return redirect()->back()->with('failed', 'Data is still under approval, or you do not have access to update this form.');
     }
 
@@ -637,7 +637,7 @@ public function approval(Request $request)
     $levelUser = Auth::user()->level;
 
     // Fetch the vendor change record from vendor_changes table
-    $vendorChange = VendorChange::where('vendor_id', $request->id)->first();
+    $vendorChange = VendorChange::with('user')->where('vendor_id', $request->id)->first();
 
     // Ensure the vendor change record exists
     if (!$vendorChange) {
@@ -691,7 +691,7 @@ public function approval(Request $request)
     } elseif ($vendorChange->level < 2) {
         $approvalRoute = ApprovalRoute::where('level', $nextApprovalLevel)->get();
     } elseif ($vendorChange->level < 3) {
-        $approvalRoute = ApprovalRoute::where('dept', $userDept)
+        $approvalRoute = ApprovalRoute::where('dept', $vendorChange->user->dept)
             ->where('level', $nextApprovalLevel)->get();
     } else {
         $approvalRoute = ApprovalRoute::where('level', $nextApprovalLevel)->get();

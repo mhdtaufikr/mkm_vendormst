@@ -20,5 +20,10 @@ class VendorChange extends Model
     {
         return $this->hasMany(ApprovalLogVendor::class, 'vendor_change_id', 'id')->orderBy('approval_timestamp', 'desc');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
 }
 
