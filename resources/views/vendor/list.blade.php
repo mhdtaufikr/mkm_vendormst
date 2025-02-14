@@ -111,22 +111,25 @@
                                         @endif
                                     </div>
 
+
                                     <!-- Table -->
-                                    <div class="table-responsive">
-                                        <table id="tableUser" class="table table-bordered table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Supplier Name</th>
-                                                    <th>Supplier Account Number</th>
-                                                    <th>Approval Route</th>
-                                                    <th>Type</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
+                                        <div class="table-responsive">
+                                            <table id="tableUser" class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Supplier Name</th>
+                                                        <th>Supplier Account Number</th>
+                                                        <th>Approval Route</th>
+                                                        <th>Type</th>
+                                                        <th>Comment</th> <!-- Added new column header for Comment -->
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+
                                 </div>
                                 <!-- /.card-body -->
                             </div>
@@ -196,6 +199,14 @@
                         return data ? data : 'No changes';
                     }
                 },
+                {
+                data: 'comment', // Adding new column data binding for Comment
+                name: 'comment',
+                render: function(data, type, full, meta) {
+                    return data ? data : ''; // Handling null or missing data
+                }
+            },
+
                 {
                     data: 'action',
                     name: 'action',

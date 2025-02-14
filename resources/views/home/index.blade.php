@@ -52,6 +52,7 @@
                                         <th>Form Type</th>
                                         <th>Name</th>
                                         <th>Change Type</th>
+                                        <th>Comment</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -62,6 +63,7 @@
                                         <td>{{ $item->type }}</td>
                                         <td>{{ $item->type == 'Supplier' ? ucwords(strtolower($item->vendor->name)) : ucwords(strtolower($item->customer->name)) }}</td>
                                         <td>{{ $item->change_type }}</td>
+                                        <td>{{$item->comment ?? ''}}</td>
                                         <td>
                                             @if ($item->level == 0)
                                                 <a href="{{ $item->type == 'Supplier' ? url('/vendor/update/' .encrypt($item->vendor_id)) : url('/customer/update/' .encrypt($item->customer_id)) }}" class="btn btn-success btn-sm">
@@ -98,7 +100,7 @@
             greet = 'Good Evening';
 
         document.getElementById('lblGreetings').innerHTML =
-            '<b>' + greet + '</b> and welcome to MKM Vendor and Customer Request';
+            '<b>' + greet + '</b> and welcome to MKM Supplier and Customer Request';
     </script>
 </main>
 @endsection

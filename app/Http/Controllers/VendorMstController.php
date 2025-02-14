@@ -32,13 +32,22 @@ class VendorMstController extends Controller
     public function index(Request $request)
 {
     if ($request->ajax()) {
-        $items = VendorMaster::with(['vendorChanges', 'vendorChanges.logs.approver'])
-            ->orderBy('updated_at', 'desc');
+        $items = VendorMaster::with(['vendorChanges' => function($query) {
+            $query->select('id', 'vendor_id', 'change_type', 'created_by', 'level', 'comment')
+                  ->with(['logs' => function($query) {
+                      $query->with('approver');
+                  }]);
+        }])->orderBy('updated_at', 'desc');
+
 
         return DataTables::eloquent($items)
         ->addColumn('change_type', function ($data) {
             // Concatenate or process `change_type` values if needed
             return $data->vendorChanges->pluck('change_type')->join(', ');
+        })
+        ->addColumn('comment', function ($item) {
+            // Assuming 'vendorChanges' is a collection and you want to concatenate comments
+            return $item->vendorChanges->pluck('comment')->join(', ');
         })
         ->addColumn('approval_route', function($data) {
             // Fetch all users to map id to name and dept
@@ -416,6 +425,7 @@ public function update($id){
 
 public function storeUpdate(Request $request)
 {
+
     // Validate the incoming request data
     $validatedData = $request->validate([
         'id' => 'required|integer|exists:vendor_masters,id',
@@ -533,6 +543,7 @@ $vendorMaster->update(array_merge($validatedData, [
             'status' => 'Pending', // Set initial status as pending
             'created_by' => Auth::id(), // Assuming you have authentication and get the current user's ID
             'level' => 1, // Update level to 1 after processing
+            'comment'=> $request->comment,
         ]);
 
         // Create a new approval log entry in approval_log_vendor table

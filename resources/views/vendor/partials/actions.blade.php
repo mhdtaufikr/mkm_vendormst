@@ -9,7 +9,7 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="/vendor/update/{{ encrypt($data->id) }}" title="Update">
+            <a class="dropdown-item" href="{{url('/vendor/update/'. encrypt($data->id))}}" title="Update">
                 <i class="fas fa-pen"></i> Update
             </a>
         </li>

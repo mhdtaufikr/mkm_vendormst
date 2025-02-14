@@ -548,11 +548,13 @@
                                                                    });
                                                                </script>
 
-
+                                                            <label for="">Comment</label>
+                                                            <textarea required class="form-control" name="comment" id=""></textarea>
 
                                                                <div class="d-flex justify-content-center">
                                                                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
                                                                </div>
+
                                                     </div>
                                                 </div>
                                             </div>
